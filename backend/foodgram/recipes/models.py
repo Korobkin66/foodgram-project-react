@@ -13,7 +13,7 @@ class Tag(models.Model):
                             unique=True)
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:30]
 
 
 class Ingredient(models.Model):
@@ -21,6 +21,9 @@ class Ingredient(models.Model):
                             max_length=200)
     unit = models.CharField(verbose_name='Единица измерения',
                             max_length=17)
+    
+    def __str__(self):
+        return self.name[:30]
 
 
 class Recipe(models.Model):
@@ -32,7 +35,7 @@ class Recipe(models.Model):
                             max_length=200)
     image = models.ImageField(
         'Картинка',
-        upload_to='recipes/',
+        upload_to='static/recipes',
         blank=True
     )
     text = models.TextField(help_text='Введите описание рецепта',
@@ -44,7 +47,7 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(verbose_name='Время приготовления')
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:30]
 
 
 class Quantity(models.Model):
@@ -54,9 +57,9 @@ class Quantity(models.Model):
                                verbose_name='Рецепт')
     ingredient = models.ForeignKey(Ingredient,
                                    on_delete=models.CASCADE,
-                                   related_name='ingredient',
+                                   related_name='vol_ingr',
                                    verbose_name='Ингредиент')
-    quantity = models.IntegerField(verbose_name='Количество')
+    amount = models.IntegerField(verbose_name='Количество')
 
     def __str__(self):
         return f'Колличество {self.ingredient} в {self.recipe}'
@@ -74,3 +77,17 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'Избранные {self.recipe} у {self.user}'
+
+
+class Shoppingcart(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name='cart',
+                             verbose_name='Пользователь')
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name='cart',
+                               verbose_name='Рецепт')
+
+    def __str__(self):
+        return f'В корзине {self.user} ингриедиеты для {self.recipe}'
