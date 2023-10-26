@@ -19,8 +19,8 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(verbose_name='Ингредиент',
                             max_length=200)
-    unit = models.CharField(verbose_name='Единица измерения',
-                            max_length=17)
+    measurement_unit = models.CharField(verbose_name='Единица измерения',
+                                        max_length=17)
     
     def __str__(self):
         return self.name[:30]
@@ -53,16 +53,16 @@ class Recipe(models.Model):
 class Quantity(models.Model):
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
-                               related_name='recipe',
+                               related_name='quan_recipe',
                                verbose_name='Рецепт')
     ingredient = models.ForeignKey(Ingredient,
                                    on_delete=models.CASCADE,
-                                   related_name='vol_ingr',
+                                   related_name='quan_ingr',
                                    verbose_name='Ингредиент')
     amount = models.IntegerField(verbose_name='Количество')
 
     def __str__(self):
-        return f'Колличество {self.ingredient} в {self.recipe}'
+        return f'Количество {self.ingredient} в {self.recipe}'
 
 
 class Favorite(models.Model):

@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.serializers import SerializerMethodField, ReadOnlyField
-from djoser.serializers import UserSerializer as UserHandleSerializer
+from djoser.serializers import (UserSerializer as UserHandleSerializer,
+                                UserCreateSerializer)
 from recipes.models import (Tag, Ingredient, Recipe,
                             Quantity, Shoppingcart, Favorite)
 from users.models import Follow, User
@@ -28,19 +29,6 @@ class MiniRecipesSerializer(serializers.ModelSerializer):
         model = Recipe
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    recipes = MiniRecipesSerializer(read_only=True, many=True)
-    recipes_count = SerializerMethodField()
-
-    class Meta:
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
-        model = User
-
-    def get_recipes_count(self, obj):
-        return obj.recipe.count()
-
-
 class UserSerializer(UserHandleSerializer):
     is_subscribed = SerializerMethodField()
 
@@ -57,6 +45,28 @@ class UserSerializer(UserHandleSerializer):
         return False
 
 
+class CustomUserCreateSerializer(UserCreateSerializer):
+    class Meta:
+        model = User
+        fields = tuple(User.REQUIRED_FIELDS) + (
+            User.USERNAME_FIELD,
+            'password',
+        )
+
+
+class FollowSerializer(UserSerializer):
+    recipes = MiniRecipesSerializer(read_only=True, many=True)
+    recipes_count = SerializerMethodField()
+
+    class Meta:
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+        model = User
+
+    def get_recipes_count(self, obj):
+        return obj.recipe.count()
+
+
 class MaxiIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -67,8 +77,8 @@ class MaxiIngredientSerializer(serializers.ModelSerializer):
         model = Quantity
 
 
-class RecipesSerializer(serializers.ModelSerializer):
-    tag = TagSerializer(read_only=True, many=True)
+class RecipeSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
                                            source='recipe')
