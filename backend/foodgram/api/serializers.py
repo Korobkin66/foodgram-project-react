@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
-from rest_framework.serializers import SerializerMethodField, ReadOnlyField
+from rest_framework.serializers import SerializerMethodField
 from djoser.serializers import (UserSerializer as UserHandleSerializer,
                                 UserCreateSerializer)
 from recipes.models import (Tag, Ingredient, Recipe,
@@ -46,6 +45,7 @@ class UserSerializer(UserHandleSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
+
     class Meta:
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
