@@ -20,18 +20,25 @@ class UserViewSet(UserViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, request, id):
         user = request.user
+        follow_author = get_object_or_404(User, id=id)
         if request.method == 'POST':
-            if Follow.objects.filter(user=user, following=id).exists():
+            if Follow.objects.filter(user=user,
+                                     following=follow_author).exists():
                 return Response({"error": "Вы уже подписаны"},
                                 status=HTTP_400_BAD_REQUEST)
-            Follow.objects.create(user=user, following=id)
-            follow_author = get_object_or_404(User, id=id)
-            serializer = FollowSerializer(follow_author)
+            
+            serializer = FollowSerializer(follow_author, data=request.data,
+                                          context={"request": request})
+            serializer.is_valid(raise_exception=True)
+            
+            Follow.objects.create(user=user, following=follow_author)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            if Follow.objects.filter(user=user, id=id).exists():
-                Follow.objects.filter(user=user, id=id).delete()
-                return Response(status=HTTP_200_OK)
+            if Follow.objects.filter(user=user,
+                                     following=follow_author).exists():
+                Follow.objects.filter(user=user,
+                                      following=follow_author).delete()
+                return Response({"log": "Вы отписались"}, status=HTTP_200_OK)
             return Response({"error": "Вы не подписаны на автора"},
                             status=HTTP_400_BAD_REQUEST)
 

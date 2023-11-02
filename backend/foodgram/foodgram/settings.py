@@ -157,15 +157,19 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+        'rest_framework.authentication.TokenAuthentication',
+        ]
+
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ],
 }
 
 
 SIMPLE_JWT = {
     # Устанавливаем срок жизни токена
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'Authorization': ('Token',),
 }
 
 DJOSER = {
@@ -173,7 +177,7 @@ DJOSER = {
     "HIDE_USERS": False,
     "PERMISSIONS": {
         "resipe": ("api.permissions.IsAuthorOrReadOnly",),
-        "user": ("api.permissions.IsAuthorOrReadOnly",),
+        "user": ("rest_framework.permissions.AllowAny",),
     },
     "SERIALIZERS": {
         "user": "api.serializers.UserSerializer",

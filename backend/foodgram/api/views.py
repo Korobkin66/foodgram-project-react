@@ -10,7 +10,7 @@ from recipes.models import Favorite, Tag, Shoppingcart, Ingredient, Recipe
 from .permissions import IsAuthorOrReadOnly, IsAdminOrReadOnly
 from .serializers import (TagSerializer, IngredientSerializer,
                           RecipeSerializer, MiniRecipesSerializer,
-                          ShoppingcartSerializer)
+                          ShoppingcartSerializer, FavoriteSerializer)
 from .services import shoppingcart
 
 
@@ -35,18 +35,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
         user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            if Favorite.objects.filter(user=user, recipe=pk).exists():
+            if Favorite.objects.filter(user=user, recipe=recipe).exists():
                 return Response({"error": "уже в Избранном"},
                                 status=HTTP_400_BAD_REQUEST)
-            Favorite.objects.create(user=user, recipe=pk)
-            fav_recipe = get_object_or_404(Recipe, id=pk)
-            serializer = MiniRecipesSerializer(fav_recipe)
+
+            serializer = FavoriteSerializer(recipe, data=request.data,
+                                            context={"request": request})
+            serializer.is_valid(raise_exception=True)
+
+            Favorite.objects.create(user=user, recipe=recipe)
+            # fav_recipe = get_object_or_404(Recipe, id=pk)
+            serializer = MiniRecipesSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            if Favorite.objects.filter(user=user, recipe=pk).exists():
-                Favorite.objects.filter(user=user, recipe=pk).delete()
-                return Response(status=HTTP_200_OK)
+            if Favorite.objects.filter(user=user, recipe=recipe).exists():
+                Favorite.objects.filter(user=user, recipe=recipe).delete()
+                return Response({"log": "Вы добавили рецепт в Избранное"},
+                                status=HTTP_200_OK)
             return Response({"error": "not in Favorites"},
                             status=HTTP_400_BAD_REQUEST)
 

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
+from rest_framework.exceptions import ValidationError
+from rest_framework.status import (HTTP_400_BAD_REQUEST)
 from djoser.serializers import (UserSerializer as UserHandleSerializer,
                                 UserCreateSerializer)
 from recipes.models import (Tag, Ingredient, Recipe,
@@ -37,7 +39,7 @@ class UserSerializer(UserHandleSerializer):
         model = User
 
     def get_is_subscribed(self, obj):
-        current_user = self.context['request'].user
+        current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(
                 user=current_user, following=obj.id).exists
@@ -65,6 +67,16 @@ class FollowSerializer(UserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipe.count()
+    
+    def validate(self,  obj):
+        author = self.instance
+        user = self.context.get('request').user
+        if user == author:
+            raise ValidationError(
+                detail='Вы не можете подписаться на самого себя!',
+                code=HTTP_400_BAD_REQUEST
+            )
+        return obj
 
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
