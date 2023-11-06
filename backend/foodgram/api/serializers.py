@@ -42,7 +42,7 @@ class UserSerializer(UserHandleSerializer):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(
-                user=current_user, following=obj.id).exists
+                user=current_user, following=obj.id).exist()
         return False
 
 
@@ -67,7 +67,7 @@ class FollowSerializer(UserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipe.count()
-    
+
     def validate(self,  obj):
         author = self.instance
         user = self.context.get('request').user
@@ -107,14 +107,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         current_user = self.context['request'].user
         if current_user.is_authenticated:
             return Favorite.objects.filter(
-                user=current_user, recipe=obj.id).exists
+                user=current_user, recipe=obj.id).exist()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         cart_user = self.context['request'].user
         if cart_user.is_authenticated:
             return Shoppingcart.objects.filter(
-                user=cart_user, recipe=obj.id).exists
+                user=cart_user, recipe=obj.id).exist()
         return False
 
 
@@ -132,6 +132,6 @@ class ShoppingcartSerializer(serializers.ModelSerializer):
         model = Shoppingcart
 
     def to_representation(self, data):
-        return MiniRecipesSerializer(data.recipe,
+        return MiniRecipesSerializer(data,
                                      context={'request':
                                               self.context['request']}).data

@@ -21,7 +21,7 @@ class Ingredient(models.Model):
                             max_length=200)
     measurement_unit = models.CharField(verbose_name='Единица измерения',
                                         max_length=17)
-    
+
     def __str__(self):
         return self.name[:30]
 

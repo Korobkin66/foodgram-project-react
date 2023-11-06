@@ -43,7 +43,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
             serializer = FavoriteSerializer(recipe, data=request.data,
                                             context={"request": request})
-            serializer.is_valid(raise_exception=True)
+            serializer.is_valid()
 
             Favorite.objects.create(user=user, recipe=recipe)
             # fav_recipe = get_object_or_404(Recipe, id=pk)
@@ -52,7 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif request.method == 'DELETE':
             if Favorite.objects.filter(user=user, recipe=recipe).exists():
                 Favorite.objects.filter(user=user, recipe=recipe).delete()
-                return Response({"log": "Вы добавили рецепт в Избранное"},
+                return Response({"log": "Вы удалили рецепт из Избранного"},
                                 status=HTTP_200_OK)
             return Response({"error": "not in Favorites"},
                             status=HTTP_400_BAD_REQUEST)
@@ -61,18 +61,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def shopping_cart(self, request, pk):
         user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            if Shoppingcart.objects.filter(user=user, recipe=pk).exists():
+            if Shoppingcart.objects.filter(user=user, recipe=recipe).exists():
                 return Response({"error": "уже в Корзине"},
                                 status=HTTP_400_BAD_REQUEST)
-            Shoppingcart.objects.create(user=user, recipe=pk)
-            shop_cart = get_object_or_404(Recipe, id=pk)
-            serializer = ShoppingcartSerializer(shop_cart)
+
+            serializer = ShoppingcartSerializer(recipe, data=request.data,
+                                                context={"request": request})
+            serializer.is_valid()
+
+            Shoppingcart.objects.create(user=user, recipe=recipe)
+            # shop_cart = get_object_or_404(Recipe, id=pk)
+            serializer = ShoppingcartSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            if Shoppingcart.objects.filter(user=user, recipe=pk).exists():
-                Shoppingcart.objects.filter(user=user, recipe=pk).delete()
-                return Response(status=HTTP_200_OK)
+            if Shoppingcart.objects.filter(user=user, recipe=recipe).exists():
+                Shoppingcart.objects.filter(user=user, recipe=recipe).delete()
+                return Response({"log": "Вы удалили рецепт из Списка покупок"},
+                                status=HTTP_200_OK)
             return Response({"error": "not in Shopping Cart"},
                             status=HTTP_400_BAD_REQUEST)
 

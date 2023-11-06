@@ -26,11 +26,11 @@ class UserViewSet(UserViewSet):
                                      following=follow_author).exists():
                 return Response({"error": "Вы уже подписаны"},
                                 status=HTTP_400_BAD_REQUEST)
-            
+
             serializer = FollowSerializer(follow_author, data=request.data,
                                           context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            
+            serializer.is_valid()
+
             Follow.objects.create(user=user, following=follow_author)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
