@@ -41,8 +41,9 @@ class UserSerializer(UserHandleSerializer):
     def get_is_subscribed(self, obj):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
-            return Follow.objects.filter(
-                user=current_user, following=obj.id).exist()
+            if Follow.objects.filter(
+                user=current_user, following=obj.id).exists():
+                return True
         return False
 
 
@@ -106,15 +107,17 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
         if current_user.is_authenticated:
-            return Favorite.objects.filter(
-                user=current_user, recipe=obj.id).exist()
+            if Favorite.objects.filter(
+                user=current_user, recipe=obj.id).exists():
+                return True
         return False
 
     def get_is_in_shopping_cart(self, obj):
         cart_user = self.context['request'].user
         if cart_user.is_authenticated:
-            return Shoppingcart.objects.filter(
-                user=cart_user, recipe=obj.id).exist()
+            if Shoppingcart.objects.filter(
+                user=cart_user, recipe=obj.id).exists():
+                return True
         return False
 
 
@@ -134,4 +137,4 @@ class ShoppingcartSerializer(serializers.ModelSerializer):
     def to_representation(self, data):
         return MiniRecipesSerializer(data,
                                      context={'request':
-                                              self.context['request']}).data
+                                              self.context.get('request')}).data

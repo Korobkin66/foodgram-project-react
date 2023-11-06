@@ -44,7 +44,8 @@ class UserViewSet(UserViewSet):
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
-    def subscribtions(self, request):
+    def subscriptions(self, request):
+        print(1)
         user = request.user
         # me = User.objects.filter(id=user)
         me = get_object_or_404(User, id=user)
