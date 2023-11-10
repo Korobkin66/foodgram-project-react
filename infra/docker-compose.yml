@@ -1,4 +1,10 @@
 version: '3.3'
+
+volumes:
+  pg_data:
+  static:
+  media:
+
 services:
 
   frontend:
@@ -7,6 +13,19 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  backend:
+    image: korobkin66/foodgram_backend
+    env_file: ../backend/foodgarm/.env
+    volumes:
+      - static:/static
+      - media:/app/media
+    depends_on:
+      - db
+    restart: on-failure
   nginx:
     image: nginx:1.19.3
     ports:
