@@ -10,21 +10,18 @@ from users.models import Follow, User
 
 
 class TagSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = '__all__'
         model = Tag
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = '__all__'
         model = Ingredient
 
 
 class MiniRecipesSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = ('id', 'name', 'image', 'cooking_time')
         model = Recipe
@@ -42,13 +39,12 @@ class UserSerializer(UserHandleSerializer):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             if Follow.objects.filter(
-                user=current_user, following=obj.id).exists():
+                    user=current_user, following=obj.id).exists():
                 return True
         return False
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
-
     class Meta:
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
@@ -69,7 +65,7 @@ class FollowSerializer(UserSerializer):
     def get_recipes_count(self, obj):
         return obj.recipe.count()
 
-    def validate(self,  obj):
+    def validate(self, obj):
         author = self.instance
         user = self.context.get('request').user
         if user == author:
@@ -108,7 +104,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         current_user = self.context['request'].user
         if current_user.is_authenticated:
             if Favorite.objects.filter(
-                user=current_user, recipe=obj.id).exists():
+                    user=current_user, recipe=obj.id).exists():
                 return True
         return False
 
@@ -116,20 +112,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         cart_user = self.context['request'].user
         if cart_user.is_authenticated:
             if Shoppingcart.objects.filter(
-                user=cart_user, recipe=obj.id).exists():
+                    user=cart_user, recipe=obj.id).exists():
                 return True
         return False
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = ('id', 'name', 'image', 'cooking_time')
         model = Recipe
 
 
 class ShoppingcartSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = '__all__'
         model = Shoppingcart
@@ -137,4 +131,4 @@ class ShoppingcartSerializer(serializers.ModelSerializer):
     def to_representation(self, data):
         return MiniRecipesSerializer(data,
                                      context={'request':
-                                              self.context.get('request')}).data
+                                                  self.context.get('request')}).data
