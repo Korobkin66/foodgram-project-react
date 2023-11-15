@@ -29,7 +29,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    # permission_classes = [IsAuthorOrReadOnly]
+    permission_classes_by_action = {
+        'create': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
+        'partial_update': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
+        'destroy': [IsAuthorOrReadOnly, IsAdminOrReadOnly]}
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
