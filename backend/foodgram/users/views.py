@@ -44,9 +44,9 @@ class UserViewSet(UserViewSet):
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
-    def subscriptions(self, request, pk=None):
+    def subscriptions(self, request):
         user = request.user
         # me = User.objects.filter(id=user)
-        # me = get_object_or_404(User, id=user.id)
-        serializer = FollowSerializer(user)
+        me = get_object_or_404(User, id=user.id)
+        serializer = FollowSerializer(me)
         return Response(serializer.data, status=HTTP_201_CREATED)
