@@ -1,11 +1,11 @@
+from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserSerializer as UserHandleSerializer
+from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
+                            Shoppingcart, Tag)
 from rest_framework import serializers
-from rest_framework.serializers import SerializerMethodField
 from rest_framework.exceptions import ValidationError
-from rest_framework.status import (HTTP_400_BAD_REQUEST)
-from djoser.serializers import (UserSerializer as UserHandleSerializer,
-                                UserCreateSerializer)
-from recipes.models import (Tag, Ingredient, Recipe,
-                            Quantity, Shoppingcart, Favorite)
+from rest_framework.serializers import SerializerMethodField
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 
 
