@@ -12,6 +12,6 @@ def shoppingcart(request):
             d_amount = 0
             if a.ingredient.name in json:
                 d_amount = json[a.ingredient.name]['Количество']
-            json[a.ingredient.name] = {'Количество': a.amount +
-                                       d_amount, 'Ед.изм.': a.ingredient.unit}
+            json[a.ingredient.name] = {'Количество': a.amount + d_amount,
+                                       'Ед.изм.': a.ingredient.unit}
     return json
