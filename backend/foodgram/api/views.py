@@ -29,7 +29,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    # permission_classes = [IsAuthorOrReadOnly]
     permission_classes_by_action = {
         'create': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
         'partial_update': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
@@ -50,7 +49,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid()
 
             Favorite.objects.create(user=user, recipe=recipe)
-            # fav_recipe = get_object_or_404(Recipe, id=pk)
             serializer = MiniRecipesSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
@@ -76,7 +74,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid()
 
             Shoppingcart.objects.create(user=user, recipe=recipe)
-            # shop_cart = get_object_or_404(Recipe, id=pk)
             serializer = ShoppingcartSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
@@ -95,10 +92,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data,
                         status=HTTP_201_CREATED, headers=headers)
 
-# начало
-
-    # @action(detail=True, methods=['patch'],
-    #         permission_classes=[IsAuthorOrReadOnly])
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance,
@@ -111,8 +104,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"log": "Рецепт успешно удален"}, status=HTTP_200_OK)
-
-# конец
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
