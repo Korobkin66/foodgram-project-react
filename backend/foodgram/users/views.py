@@ -47,4 +47,4 @@ class UserViewSet(UserViewSet):
         # me = User.objects.filter(id=user)
         me = get_object_or_404(User, id=user.id)
         serializer = FollowSerializer(me)
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.data, status=HTTP_200_OK)
