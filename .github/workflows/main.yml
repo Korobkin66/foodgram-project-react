@@ -176,6 +176,24 @@ jobs:
     - name: List files before copy
       run: ls -R
     
+    - name: Debug environment variables
+      run: |
+        echo "HOST=$HOST"
+        echo "USER=$USER"
+        echo "SSH_KEY=$SSH_KEY"
+        echo "SSH_KEY=$SSH_KEY"
+        echo "SSH_PASSPHRASE=$SSH_PASSPHRASE"
+        echo "DOCKER_USERNAME=$DOCKER_USERNAME"
+        echo "DOCKER_PASSWORD=$DOCKER_PASSWORD"
+        echo "POSTGRES_USER=$POSTGRES_USER"
+        echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+        echo "POSTGRES_DB=$POSTGRES_DB"
+        # Добавьте вывод других переменных, которые вы используете
+  
+    - name: Check server connection
+      run: |
+        ssh -o StrictHostKeyChecking=no -p $PORT $USER@$HOST
+  
     # Копируем docker-compose.production.yml на продакшен-сервер
     - name: Copy docker-compose.yml via ssh
       uses: appleboy/scp-action@master
