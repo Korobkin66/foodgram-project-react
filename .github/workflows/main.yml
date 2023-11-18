@@ -173,8 +173,8 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: List files before copy
-      run: ls -R
+    # - name: List files before copy
+    #   run: ls -R
     
     - name: Debug environment variables
       run: |
@@ -192,7 +192,7 @@ jobs:
   
     - name: Check server connection
       run: |
-        ssh -o StrictHostKeyChecking=no -p 22 $USER@$HOST
+        ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.USER }}@${{ secrets.HOST }}
   
     # Копируем docker-compose.production.yml на продакшен-сервер
     - name: Copy docker-compose.yml via ssh
