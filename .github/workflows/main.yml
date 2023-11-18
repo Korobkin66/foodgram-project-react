@@ -192,7 +192,7 @@ jobs:
   
     - name: Check server connection
       run: |
-        ssh -o StrictHostKeyChecking=no -p $PORT $USER@$HOST
+        ssh -o StrictHostKeyChecking=no -p 22 $USER@$HOST
   
     # Копируем docker-compose.production.yml на продакшен-сервер
     - name: Copy docker-compose.yml via ssh
