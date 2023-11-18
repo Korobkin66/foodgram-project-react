@@ -176,15 +176,6 @@ jobs:
     - name: List files before copy
       run: ls -R
     
-    - name: Check Docker version
-      run: docker --version
-    
-    - name: Check Docker Compose version
-      run: docker-compose --version
-    
-    - name: Debug docker-compose.production.yml
-      run: cat docker-compose.production.yml
-
     # Копируем docker-compose.production.yml на продакшен-сервер
     - name: Copy docker-compose.yml via ssh
       uses: appleboy/scp-action@master
@@ -209,11 +200,11 @@ jobs:
         script: |
           cd foodgram
           # Выполняет pull образов с Docker Hub
-          sudo docker-compose -f docker-compose.production.yml pull
+          sudo docker compose -f docker-compose.production.yml pull
           # Перезапускает все контейнеры в Docker Compose
-          sudo docker-compose -f docker-compose.production.yml down
-          sudo docker-compose -f docker-compose.production.yml up -d
+          sudo docker compose -f docker-compose.production.yml down
+          sudo docker compose -f docker-compose.production.yml up -d
           # Выполняет миграции и сбор статики
-          sudo docker-compose -f docker-compose.production.yml exec backend python manage.py migrate
-          sudo docker-compose -f docker-compose.production.yml exec backend python manage.py collectstatic
-          sudo docker-compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /static/static/
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+          sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /static/static/
