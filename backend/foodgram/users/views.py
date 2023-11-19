@@ -40,26 +40,24 @@ class UserViewSet(UserViewSet):
             return Response({"error": "Вы не подписаны на автора"},
                             status=HTTP_400_BAD_REQUEST)
 
-    # @action(detail=False, methods=['get'],
-    #         permission_classes=[permissions.IsAuthenticated])
-    # def subscriptions(self, request):
-    #     user = request.user
-    #     # me = User.objects.filter(id=user)
-    #     me = get_object_or_404(User, id=user.id)
-    #     serializer = FollowSerializer(me)
-    #     return Response(serializer.data, status=HTTP_200_OK)
-
     @action(detail=False, methods=['get'],
-            permission_classes=[permissions.IsAuthenticated],
-            url_path='subscriptions')
+            permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
-        subscribed_users = Follow.objects.filter(user=user).values_list(
-            'following', flat=True)
-
-        # Предполагается, что у вас есть метод в
-        # UserSerializer для сериализации подписанных пользователей
-        serializer = FollowSerializer(
-            User.objects.filter(id__in=subscribed_users), many=True)
-
+        # me = User.objects.filter(id=user)
+        me = get_object_or_404(User, id=user.id)
+        serializer = FollowSerializer(me)
         return Response(serializer.data, status=HTTP_200_OK)
+
+    # @action(detail=False, methods=['get'],
+    #         permission_classes=[permissions.IsAuthenticated],
+    #         url_path='subscriptions')
+    # def subscriptions(self, request):
+    #     user = request.user
+    #     subscribed_users = Follow.objects.filter(user=user).values_list(
+    #         'following', flat=True)
+
+    #     serializer = FollowSerializer(
+    #         User.objects.filter(id__in=subscribed_users), many=True)
+
+    #     return Response(serializer.data, status=HTTP_200_OK)
