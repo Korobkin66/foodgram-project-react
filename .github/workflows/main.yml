@@ -177,6 +177,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y docker-compose
+        which docker-compose
+        docker-compose --version
 
     # - name: List files before copy
     #   run: ls -R
