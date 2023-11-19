@@ -81,10 +81,10 @@
 │   ├── src
 │   └── yarn.lock
 ├── infra
-│   ├── docker-compose.production.yml
 │   ├── docker-compose.yml
 │   └── nginx.conf
 ├── setup.cfg
+├── ocker-compose.production.yml
 ├── tree_structure.txt
-└── venv2
+├── venv2
 └── .env

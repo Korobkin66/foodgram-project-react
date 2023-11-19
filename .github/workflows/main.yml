@@ -224,6 +224,7 @@ jobs:
         # с которым установлено соединение
         script: |
 
+          cd foodgram
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
           sudo docker-compose -f docker-compose.production.yml stop
