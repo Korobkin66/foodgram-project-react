@@ -87,3 +87,4 @@
 ├── setup.cfg
 ├── tree_structure.txt
 └── venv2
+└── .env
