@@ -40,7 +40,8 @@ class UserViewSet(UserViewSet):
             return Response({"error": "Вы не подписаны на автора"},
                             status=HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'],
+            permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
         print('я туту')
