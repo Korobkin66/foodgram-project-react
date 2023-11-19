@@ -7,7 +7,7 @@ app_name = 'api'
 
 router = DefaultRouter()
 
-router.register('users', UserViewSet)
+router.register('users', UserViewSet, basename='users')
 
 
 urlpatterns = [
