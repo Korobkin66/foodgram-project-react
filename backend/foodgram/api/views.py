@@ -12,8 +12,6 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
                           MiniRecipesSerializer, RecipeSerializer,
                           ShoppingcartSerializer, TagSerializer)
 from .services import shoppingcart
-# from users import views  # удалить
-from django.urls import reverse
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -66,8 +64,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        url = reverse('api:user-subscriptions')
-        print(url)  # удалить эти две строки
+
         if request.method == 'POST':
             if Shoppingcart.objects.filter(user=user, recipe=recipe).exists():
                 return Response({"error": "уже в Корзине"},
