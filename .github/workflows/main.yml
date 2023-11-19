@@ -226,9 +226,9 @@ jobs:
 
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
-          sudo docker-compose stop
-          sudo docker-compose rm backend
-          sudo docker-compose rm frontend
+          sudo docker-compose -f docker-compose.production.yml stop
+          sudo docker-compose -f docker-compose.production.yml rm backend
+          sudo docker-compose -f docker-compose.production.yml rm frontend
           touch .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
           echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
@@ -237,8 +237,7 @@ jobs:
           echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
           echo DB_HOST=${{ secrets.DB_HOST }} >> .env
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-          cd foodgram
-          sudo docker-compose up -d --build
+          sudo docker-compose -f docker-compose.production.yml up -d --build
 
           # cd foodgram
           # sudo apt-get update
