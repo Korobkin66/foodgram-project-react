@@ -8,14 +8,14 @@ volumes:
 services:
   db:
     image: postgres:13
-    env_file: ../.env
+    env_file: .env
     volumes:
       - pg_data_production:/var/lib/postgresql/data
     ports:
       - 5433:5432
   backend:
     image: korobkin66/foodgram_backend
-    env_file: ../.env
+    env_file: .env
     volumes:
       - static:/static
       - media:/app/media
@@ -24,7 +24,7 @@ services:
     restart: on-failure
   frontend:
     image: korobkin66/foodgram_frontend 
-    env_file: ../.env
+    env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
