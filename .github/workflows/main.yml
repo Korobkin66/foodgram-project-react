@@ -223,13 +223,30 @@ jobs:
         # которые нужно выполнить на сервере, 
         # с которым установлено соединение
         script: |
-          cd foodgram
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          sudo docker-compose -f docker-compose.production.yml pull
-          sudo docker-compose -f docker-compose.production.yml down
-          sudo docker-compose -f docker-compose.production.yml up -d
-          sudo docker-compose -f docker-compose.production.yml exec -T backend python manage.py migrate
-          sudo docker-compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic
-          sudo docker-compose -f docker-compose.production.yml exec -T backend cp -r /app/collected_static/. /static/static/
+
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
+          sudo docker-compose stop
+          sudo docker-compose rm backend
+          sudo docker-compose rm frontend
+          rm .env
+          touch .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          sudo docker-compose up -d --build
+
+          # cd foodgram
+          # sudo apt-get update
+          # sudo apt-get install -y docker-compose
+          # sudo docker-compose -f docker-compose.production.yml pull
+          # sudo docker-compose -f docker-compose.production.yml down
+          # sudo docker-compose -f docker-compose.production.yml up -d
+          # sudo docker-compose -f docker-compose.production.yml exec -T backend python manage.py migrate
+          # sudo docker-compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic
+          # sudo docker-compose -f docker-compose.production.yml exec -T backend cp -r /app/collected_static/. /static/static/
       

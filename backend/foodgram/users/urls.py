@@ -12,10 +12,11 @@ router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('auth/', include("djoser.urls.authtoken")),
-    # path('users/subscriptions/',
-    #      UserViewSet.as_view(metod = 'get')),
     path('', include('djoser.urls')),
     path('', include(router.urls)),
+    path('users/subscriptions/',
+         UserViewSet.as_view({'get': 'subscriptions'}),
+         name='user-subscriptions'),
 ]
 
 # from django.urls import path, include
