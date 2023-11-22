@@ -1,12 +1,15 @@
+import logging
+
 from django.http import HttpResponse
-from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
 from recipes.models import Favorite, Ingredient, Recipe, Shoppingcart, Tag
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_400_BAD_REQUEST)
+from users.models import Follow, User
 
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
@@ -14,9 +17,6 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           RecipeSerializer, ShoppingcartSerializer,
                           TagSerializer, UserSerializer)
 from .services import shoppingcart
-from users.models import Follow, User
-
-import logging
 
 logger = logging.getLogger(__name__)
 
