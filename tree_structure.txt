@@ -84,7 +84,7 @@
 │   ├── docker-compose.yml
 │   └── nginx.conf
 ├── setup.cfg
-├── ocker-compose.production.yml
+├── docker-compose.production.yml
 ├── tree_structure.txt
 ├── venv2
 └── .env

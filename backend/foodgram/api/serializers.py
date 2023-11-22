@@ -54,6 +54,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class FollowSerializer(UserSerializer):
+    id = serializers.ReadOnlyField(source='user.id')
+    email = serializers.ReadOnlyField(source='user.email')
+    username = serializers.ReadOnlyField(source='user.username')
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
+    is_subscribed = serializers.SerializerMethodField()
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
@@ -61,9 +67,16 @@ class FollowSerializer(UserSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
         model = User
+        read_only_fields = ("all",)
+
+    def get_is_subscribed(self, obj):
+        if Follow.objects.filter(user=obj.user,
+                                 following=obj.following).exists():
+            return True
+        return False
 
     def get_recipes_count(self, obj):
-        return obj.recipe.count()
+        return Recipe.objects.filter(author=obj.user).count()
 
     def validate(self, obj):
         author = self.instance
