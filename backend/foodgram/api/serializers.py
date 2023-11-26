@@ -71,10 +71,8 @@ class FollowSerializer(UserSerializer):
         read_only_fields = ("all",)
 
     def get_is_subscribed(self, obj):
-        if Follow.objects.filter(user=obj.user,
-                                 following=obj.following).exists():
-            return True
-        return False
+        return Follow.objects.filter(user=obj.user,
+                                     following=obj.following).exists()
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.user).count()
@@ -117,17 +115,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
         if current_user.is_authenticated:
-            if Favorite.objects.filter(
-                    user=current_user, recipe=obj.id).exists():
-                return True
+            return Favorite.objects.filter(user=current_user,
+                                           recipe=obj.id).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         cart_user = self.context['request'].user
         if cart_user.is_authenticated:
-            if ShoppingCart.objects.filter(
-                    user=cart_user, recipe=obj.id).exists():
-                return True
+            return ShoppingCart.objects.filter(user=cart_user,
+                                               recipe=obj.id).exists()
         return False
 
 
