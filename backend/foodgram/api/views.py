@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import Favorite, Ingredient, Recipe, Shoppingcart, Tag
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -50,8 +50,7 @@ class UserViewSet(UserViewSet):
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request, id=None):
-        user = request.user
-        queryset = Follow.objects.filter(user=user)
+        queryset = Follow.objects.filter(user=request.user)
         serializer = FollowSerializer(
             queryset,
             many=True,
