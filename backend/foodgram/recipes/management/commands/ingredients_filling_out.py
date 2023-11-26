@@ -5,7 +5,7 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
-    help = 'Заполнение ингридиентов'
+    help = 'Заполнение ингредиентов'
 
     def handle(self, *args, **options):
         with open('data/ingredients.json', 'r') as f:
