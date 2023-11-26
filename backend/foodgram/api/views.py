@@ -1,5 +1,3 @@
-import logging
-
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -16,9 +14,7 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, MiniRecipesSerializer,
                           RecipeSerializer, ShoppingcartSerializer,
                           TagSerializer, UserSerializer)
-from .services import shoppingcart
-
-logger = logging.getLogger(__name__)
+from .services import get_shopping_cart
 
 
 class UserViewSet(UserViewSet):
@@ -54,7 +50,6 @@ class UserViewSet(UserViewSet):
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request, id=None):
-        logger.info('Метод subscriptions вызван!')
         user = request.user
         queryset = Follow.objects.filter(user=user)
         serializer = FollowSerializer(
@@ -117,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
 
         if request.method == 'POST':
-            if Shoppingcart.objects.filter(user=user, recipe=recipe).exists():
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
                 return Response({"error": "уже в Корзине"},
                                 status=HTTP_400_BAD_REQUEST)
 
@@ -125,12 +120,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                 context={"request": request})
             serializer.is_valid()
 
-            Shoppingcart.objects.create(user=user, recipe=recipe)
+            ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = ShoppingcartSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            if Shoppingcart.objects.filter(user=user, recipe=recipe).exists():
-                Shoppingcart.objects.filter(user=user, recipe=recipe).delete()
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+                ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
                 return Response({"log": "Вы удалили рецепт из Списка покупок"},
                                 status=HTTP_200_OK)
             return Response({"error": "not in Shopping Cart"},
@@ -160,7 +155,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        shoping_cart = shoppingcart(request)
+        shoping_cart = get_shopping_cart(request)
         response = HttpResponse(shoping_cart,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'
