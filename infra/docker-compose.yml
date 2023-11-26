@@ -22,7 +22,7 @@ services:
     image: korobkin66/foodgram_backend
     env_file: ../.env
     volumes:
-      - static:/static #backend_static?
+      - static:/static  #backend_static?
       - media:/app/media
     depends_on:
       - db
