@@ -133,7 +133,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Recipe
 
 
-class ShoppingcartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = ShoppingCart

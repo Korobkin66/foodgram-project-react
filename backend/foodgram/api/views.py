@@ -12,7 +12,7 @@ from users.models import Follow, User
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, MiniRecipesSerializer,
-                          RecipeSerializer, ShoppingcartSerializer,
+                          RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, UserSerializer)
 from .services import get_shopping_cart
 
@@ -29,14 +29,14 @@ class UserViewSet(UserViewSet):
         if request.method == 'POST':
             serializer = FollowSerializer(follow_author, data=request.data,
                                           context={"request": request})
-            serializer.is_valid()
+            serializer.is_valid(raise_exception=True)
 
             Follow.objects.create(user=user, following=follow_author)
             return Response(serializer.data, status=HTTP_201_CREATED)
         if Follow.objects.filter(user=user,
-                                    following=follow_author).exists():
+                                 following=follow_author).exists():
             Follow.objects.filter(user=user,
-                                    following=follow_author).delete()
+                                  following=follow_author).delete()
             return Response({"log": "Вы отписались"}, status=HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='subscriptions',
@@ -79,7 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = FavoriteSerializer(recipe, data=request.data,
                                             context={"request": request})
-            serializer.is_valid()
+            serializer.is_valid(raise_exception=True)
 
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = MiniRecipesSerializer(recipe)
@@ -96,40 +96,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
 
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-                return Response({"error": "уже в Корзине"},
-                                status=HTTP_400_BAD_REQUEST)
-
-            serializer = ShoppingcartSerializer(recipe, data=request.data,
+            serializer = ShoppingCartSerializer(recipe, data=request.data,
                                                 context={"request": request})
-            serializer.is_valid()
+            serializer.is_valid(raise_exception=True)
 
             ShoppingCart.objects.create(user=user, recipe=recipe)
-            serializer = ShoppingcartSerializer(recipe)
+            serializer = ShoppingCartSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
-        elif request.method == 'DELETE':
-            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-                ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
-                return Response({"log": "Вы удалили рецепт из Списка покупок"},
-                                status=HTTP_200_OK)
-            return Response({"error": "not in Shopping Cart"},
-                            status=HTTP_400_BAD_REQUEST)
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save(author=request.user)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data,
-    #                     status=HTTP_201_CREATED, headers=headers)
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
+            return Response({"log": "Вы удалили рецепт из Списка покупок"},
+                            status=HTTP_200_OK)
 
-    # def partial_update(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance,
-    #                                      data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author=request.user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data,
+                        status=HTTP_201_CREATED, headers=headers)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance,
+                                         data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -139,8 +133,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        shoping_cart = get_shopping_cart(request)
-        response = HttpResponse(shoping_cart,
+        shopping_cart = get_shopping_cart(request)
+        response = HttpResponse(shopping_cart,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'
         response["Content-Disposition"] = f"attachment; filename={filename}"
