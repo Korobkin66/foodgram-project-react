@@ -1,6 +1,5 @@
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
@@ -87,6 +86,12 @@ class FollowSerializer(UserSerializer):
             )
         return obj
 
+    def create(self, validated_data):
+        user = self.context['request'].user
+        following_user = self.instance
+        follow = Follow.objects.create(user=user, following=following_user)
+        return follow
+
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
@@ -172,13 +177,34 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('id', 'name', 'image', 'cooking_time')
-        model = Recipe
+class FavoriteSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all(),
+                                            write_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
+                                   required=False)
+    name = serializers.CharField(source='recipe.name', read_only=True)
+    image = serializers.ImageField(source='recipe.image', read_only=True)
+    cooking_time = serializers.DurationField(source='recipe.cooking_time',
+                                             read_only=True)
+
+    def create(self, validated_data):
+        user = validated_data.get('user', self.context['request'].user)
+        recipe = validated_data['id']
+        favorite, created = Favorite.objects.get_or_create(user=user,
+                                                           recipe=recipe)
+        return favorite
+
+    def delete(self, validated_data):
+        user = validated_data.get('user', self.context['request'].user)
+        recipe = validated_data['id']
+        favorite = Favorite.objects.get(user=user, recipe=recipe)
+        favorite.delete()
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
+                                   required=False)
+
     class Meta:
         fields = '__all__'
         model = ShoppingCart

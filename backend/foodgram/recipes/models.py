@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.db.models.constraints import UniqueConstraint
 
 from users.models import User
 
@@ -69,11 +70,13 @@ class Quantity(models.Model):
                                    verbose_name='Ингредиент')
     amount = models.IntegerField(verbose_name='Количество')
 
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['recipe', 'ingredient'],
+                             name='unique_quantity')]
+
     def __str__(self):
         return f'Количество {self.ingredient} в {self.recipe}'
-
-    class Meta:
-        unique_together = ('recipe', 'ingredient')
 
 
 class Favorite(models.Model):
@@ -86,11 +89,13 @@ class Favorite(models.Model):
                                related_name='favorites',
                                verbose_name='Рецепт')
 
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['user', 'recipe'],
+                             name='unique_favorite')]
+
     def __str__(self):
         return f'Избранные {self.recipe} у {self.user}'
-
-    class Meta:
-        unique_together = ('user', 'recipe')
 
 
 class ShoppingCart(models.Model):
@@ -103,8 +108,10 @@ class ShoppingCart(models.Model):
                                related_name='cart',
                                verbose_name='Рецепт')
 
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['user', 'recipe'],
+                             name='unique_shopping_cart')]
+
     def __str__(self):
         return f'В корзине {self.user} ингриедиеты для {self.recipe}'
-
-    class Meta:
-        unique_together = ('user', 'recipe')

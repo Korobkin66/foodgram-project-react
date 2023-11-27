@@ -1,16 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED)
-from users.models import Follow, User
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
+                                   HTTP_400_BAD_REQUEST)
 
+from users.models import Follow, User
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
-                          IngredientSerializer, MiniRecipesSerializer,
+                          IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, UserSerializer)
 from .services import get_shopping_cart
@@ -25,18 +26,23 @@ class UserViewSet(UserViewSet):
     def subscribe(self, request, id):
         user = request.user
         follow_author = get_object_or_404(User, id=id)
+        if follow_author == user:
+            return Response({"log": "Вы не можете подписаться на себя"},
+                            status=HTTP_400_BAD_REQUEST)
         if request.method == 'POST':
-            serializer = FollowSerializer(follow_author, data=request.data,
+            serializer = FollowSerializer(data=request.data,
+                                          instance=follow_author,
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)
-
-            Follow.objects.create(user=user, following=follow_author)
+            serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
-        if Follow.objects.filter(user=user,
-                                 following=follow_author).exists():
-            Follow.objects.filter(user=user,
-                                  following=follow_author).delete()
+
+        if Follow.objects.filter(user=user, following=follow_author).exists():
+            Follow.objects.filter(user=user, following=follow_author).delete()
             return Response({"log": "Вы отписались"}, status=HTTP_200_OK)
+        else:
+            return Response({"log": "Вы не подписаны на пользователя"},
+                            status=HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated])
@@ -70,43 +76,39 @@ class RecipeViewSet(viewsets.ModelViewSet):
         'partial_update': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
         'destroy': [IsAuthorOrReadOnly, IsAdminOrReadOnly]}
 
+    def fav_or_shop_metod(self, request, pk, model, serializer_class):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        if request.method == 'POST':
+            serializer = serializer_class(data={'user': user.id,
+                                                'recipe': recipe.id},
+                                          context={"request": request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response_data = {"log": "Рецепт успешно добавлен в список."}
+            status_code = HTTP_201_CREATED
+        else:
+            if model.objects.filter(user=user, recipe=recipe).exists():
+                model.objects.filter(user=user, recipe=recipe).delete()
+                response_data = {"log": "Рецепт успешно удален из списка."}
+            else:
+                response_data = {"log": "В списке отсутствует данный рецепт."}
+            status_code = HTTP_200_OK
+
+        return Response(response_data, status=status_code)
+
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'POST':
-            serializer = FavoriteSerializer(recipe, data=request.data,
-                                            context={"request": request})
-            serializer.is_valid(raise_exception=True)
-
-            Favorite.objects.create(user=user, recipe=recipe)
-            serializer = MiniRecipesSerializer(recipe)
-            return Response(serializer.data, status=HTTP_201_CREATED)
-        if Favorite.objects.filter(user=user, recipe=recipe).exists():
-            Favorite.objects.filter(user=user, recipe=recipe).delete()
-            return Response({"log": "Вы удалили рецепт из Избранного"},
-                            status=HTTP_200_OK)
+        return self.fav_or_shop_metod(request, pk,
+                                      Favorite, FavoriteSerializer)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def shopping_cart(self, request, pk):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=pk)
-
-        if request.method == 'POST':
-            serializer = ShoppingCartSerializer(recipe, data=request.data,
-                                                context={"request": request})
-            serializer.is_valid(raise_exception=True)
-
-            ShoppingCart.objects.create(user=user, recipe=recipe)
-            serializer = ShoppingCartSerializer(recipe)
-            return Response(serializer.data, status=HTTP_201_CREATED)
-
-        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-            ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
-            return Response({"log": "Вы удалили рецепт из Списка покупок"},
-                            status=HTTP_200_OK)
+        return self.fav_or_shop_metod(request, pk, ShoppingCart,
+                                      ShoppingCartSerializer)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
