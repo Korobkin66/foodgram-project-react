@@ -3,9 +3,10 @@ from django.core.validators import MinValueValidator
 
 from users.models import User
 
-MAX_NUMB_OF_CHAR=200
-MAX_LENGTH_COLOR_CODE=10
-MAX_LENGTH_UNIT=17
+MAX_NUMB_OF_CHAR = 200
+MAX_LENGTH_COLOR_CODE = 10
+MAX_LENGTH_UNIT = 17
+
 
 class Tag(models.Model):
     name = models.CharField(verbose_name='Тэг',

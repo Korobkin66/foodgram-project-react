@@ -1,17 +1,18 @@
-from recipes.models import Shoppingcart
+from django.db.models import Sum
+
+from recipes.models import Quantity
 
 
-def shoppingcart(request):
+def get_shopping_cart(request):
     json = {}
     user = request.user
-    shopping_recipe = Shoppingcart.objects.filter(user=user).all()
-    for recipe in shopping_recipe:
-        quantity = recipe.recipe.quan_recipe.all()
-        for a in quantity:
-            print(a.ingredient.name, a.amount, a.ingredient.unit)
-            d_amount = 0
-            if a.ingredient.name in json:
-                d_amount = json[a.ingredient.name]['Количество']
-            json[a.ingredient.name] = {'Количество': a.amount + d_amount,
-                                       'Ед.изм.': a.ingredient.unit}
+    quantities = (
+        Quantity.objects
+        .filter(recipe__author=user)
+        .values('ingredient__name', 'ingredient__measurement_unit')
+        .annotate(quantity=Sum('amount')))
+    for quantity in quantities:
+        json[quantity['ingredient__name']] = {
+            'Количество': quantity['quantity'],
+            'Ед.изм.': quantity['ingredient__measurement_unit']}
     return json
