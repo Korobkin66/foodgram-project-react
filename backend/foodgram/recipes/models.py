@@ -1,15 +1,20 @@
 from django.db import models
+from django.core.validators import MinValueValidator
+
 from users.models import User
 
+MAX_NUMB_OF_CHAR=200
+MAX_LENGTH_COLOR_CODE=10
+MAX_LENGTH_UNIT=17
 
 class Tag(models.Model):
     name = models.CharField(verbose_name='Тэг',
-                            max_length=200,
+                            max_length=MAX_NUMB_OF_CHAR,
                             unique=True)
     color = models.CharField(verbose_name='Цветовой код',
-                             max_length=10,
+                             max_length=MAX_LENGTH_COLOR_CODE,
                              unique=True)
-    slug = models.SlugField(max_length=200,
+    slug = models.SlugField(max_length=MAX_NUMB_OF_CHAR,
                             unique=True)
 
     def __str__(self):
@@ -18,9 +23,9 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(verbose_name='Ингредиент',
-                            max_length=200)
+                            max_length=MAX_NUMB_OF_CHAR)
     measurement_unit = models.CharField(verbose_name='Единица измерения',
-                                        max_length=17)
+                                        max_length=MAX_LENGTH_UNIT)
 
     def __str__(self):
         return self.name[:30]
@@ -29,10 +34,10 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
-                               related_name='recipe',
+                               related_name='recipes',
                                verbose_name='Автор')
     name = models.CharField(verbose_name='Название',
-                            max_length=200)
+                            max_length=MAX_NUMB_OF_CHAR)
     image = models.ImageField(
         'Картинка',
         upload_to='static/recipes',
@@ -40,11 +45,13 @@ class Recipe(models.Model):
     )
     text = models.TextField(help_text='Введите описание рецепта',
                             verbose_name='Описание рецепта')
-    ingredients = models.ManyToManyField(Ingredient, related_name='recipe',
+    ingredients = models.ManyToManyField(Ingredient, related_name='recipes',
                                          verbose_name='Ингредиент')
-    tags = models.ManyToManyField(Tag, related_name='recipe',
+    tags = models.ManyToManyField(Tag, related_name='recipes',
                                   verbose_name='Тэг')
-    cooking_time = models.IntegerField(verbose_name='Время приготовления')
+    cooking_time = models.IntegerField(
+        verbose_name='Время приготовления',
+        validators=[MinValueValidator(0)])
 
     def __str__(self):
         return self.name[:30]
@@ -64,6 +71,9 @@ class Quantity(models.Model):
     def __str__(self):
         return f'Количество {self.ingredient} в {self.recipe}'
 
+    class Meta:
+        unique_together = ('recipe', 'ingredient')
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(User,
@@ -78,8 +88,11 @@ class Favorite(models.Model):
     def __str__(self):
         return f'Избранные {self.recipe} у {self.user}'
 
+    class Meta:
+        unique_together = ('user', 'recipe')
 
-class Shoppingcart(models.Model):
+
+class ShoppingCart(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              related_name='cart',
@@ -91,3 +104,6 @@ class Shoppingcart(models.Model):
 
     def __str__(self):
         return f'В корзине {self.user} ингриедиеты для {self.recipe}'
+
+    class Meta:
+        unique_together = ('user', 'recipe')
