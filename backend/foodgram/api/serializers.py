@@ -126,6 +126,51 @@ class RecipeSerializer(serializers.ModelSerializer):
                                                recipe=obj.id).exists()
         return False
 
+    def create(self, validated_data):
+        tags_data = validated_data.pop('tags', [])
+        ingredients_data = validated_data.pop('recipe', [])
+
+        validated_data['author'] = self.context['request'].user
+        recipe = Recipe(**validated_data)
+        recipe.save()
+
+        tags = [Tag.objects.get_or_create(**tag_data)[0]
+                for tag_data in tags_data]
+        recipe.tags.set(tags)
+
+        for ingredient_data in ingredients_data:
+            ingredient, created = Ingredient.objects.get_or_create(
+                **ingredient_data['ingredient'])
+            quantity, created = Quantity.objects.update_or_create(
+                recipe=recipe, ingredient=ingredient, defaults=ingredient_data
+            )
+
+        return recipe
+
+    def update(self, instance, validated_data):
+        tags_data = validated_data.pop('tags', [])
+        ingredients_data = validated_data.pop('recipe', [])
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
+
+        tags = [Tag.objects.get_or_create(**tag_data)[0]
+                for tag_data in tags_data]
+        instance.tags.set(tags)
+
+        for ingredient_data in ingredients_data:
+            ingredient, created = Ingredient.objects.get_or_create(
+                **ingredient_data['ingredient'])
+            quantity, created = Quantity.objects.update_or_create(
+                recipe=instance, ingredient=ingredient,
+                defaults=ingredient_data)
+
+        instance.save()
+        return instance
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:

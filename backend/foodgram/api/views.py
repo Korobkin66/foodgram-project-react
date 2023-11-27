@@ -5,8 +5,7 @@ from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_400_BAD_REQUEST)
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED)
 from users.models import Follow, User
 
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
@@ -108,22 +107,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
             return Response({"log": "Вы удалили рецепт из Списка покупок"},
                             status=HTTP_200_OK)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=request.user)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data,
-                        status=HTTP_201_CREATED, headers=headers)
-
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance,
-                                         data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
