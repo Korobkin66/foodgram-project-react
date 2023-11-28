@@ -11,15 +11,15 @@ from users.models import Follow, User
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
-                          IngredientSerializer,
+                          IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
-                          TagSerializer, UserSerializer)
+                          TagSerializer)
 from .services import get_shopping_cart
 
 
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = BaseUserSerializer
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
@@ -29,9 +29,11 @@ class UserViewSet(UserViewSet):
         if follow_author == user:
             return Response({"log": "Вы не можете подписаться на себя"},
                             status=HTTP_400_BAD_REQUEST)
+        follow_instance, created = Follow.objects.get_or_create(
+            user=user, following=follow_author)
         if request.method == 'POST':
             serializer = FollowSerializer(data=request.data,
-                                          instance=follow_author,
+                                          instance=follow_instance,
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()

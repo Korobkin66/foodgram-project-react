@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
@@ -28,20 +30,25 @@ class MiniRecipesSerializer(serializers.ModelSerializer):
         model = Recipe
 
 
-class UserSerializer(UserHandleSerializer):
-    is_subscribed = SerializerMethodField()
+class BaseUserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed')
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
         model = User
 
     def get_is_subscribed(self, obj):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
-            return Follow.objects.filter(
-                user=current_user, following=obj.id).exists()
+            return Follow.objects.filter(user=current_user,
+                                         following=obj.id).exists()
         return False
+
+
+class UserSerializer(UserHandleSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        pass
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -54,24 +61,11 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class FollowSerializer(UserSerializer):
-    id = serializers.ReadOnlyField(source='user.id')
-    email = serializers.ReadOnlyField(source='user.email')
-    username = serializers.ReadOnlyField(source='user.username')
-    first_name = serializers.ReadOnlyField(source='user.first_name')
-    last_name = serializers.ReadOnlyField(source='user.last_name')
-    is_subscribed = serializers.SerializerMethodField()
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
-    class Meta:
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
-        model = User
-        read_only_fields = ("all",)
-
-    def get_is_subscribed(self, obj):
-        return Follow.objects.filter(user=obj.user,
-                                     following=obj.following).exists()
+    class Meta(BaseUserSerializer.Meta):
+        fields = ('recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.user).count()
@@ -111,10 +105,25 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
+    def validate_recipe(self, value):
+        ingredient_names = set()
+        for ingredient_data in value:
+            ingredient_name = ingredient_data['ingredient']['name']
+            if ingredient_name in ingredient_names:
+                raise serializers.ValidationError(
+                    f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
+            ingredient_names.add(ingredient_name)
+        return value
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        self.validate_recipe(validated_data.get('recipe', []))
+        return validated_data
+
     class Meta:
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
-                  'cooking_time')
+                  'cooking_time', 'recipe')
         model = Recipe
 
     def get_is_favorited(self, obj):
@@ -131,49 +140,37 @@ class RecipeSerializer(serializers.ModelSerializer):
                                                recipe=obj.id).exists()
         return False
 
+    def process_tags_and_ings(self, instance, tags_data, ingredients_data):
+        with transaction.atomic():
+            tags_to_create = [Tag(**tag_data) for tag_data in tags_data]
+            tags = Tag.objects.bulk_create(tags_to_create)
+            instance.tags.set(tags)
+
+            ingredients = {ingredient_data['ingredient']['name']:
+                           Ingredient(**ingredient_data['ingredient'])
+                           for ingredient_data in ingredients_data}
+            Ingredient.objects.bulk_create(list(ingredients.values()),
+                                           ignore_conflicts=True)
+
+            quantities_to_create = [Quantity(
+                recipe=instance,
+                ingredient=ingredients[ingredient_data['ingredient']['name']],
+                **ingredient_data) for ingredient_data in ingredients_data]
+            Quantity.objects.bulk_create(quantities_to_create)
+
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipe', [])
-
         validated_data['author'] = self.context['request'].user
-        recipe = Recipe(**validated_data)
-        recipe.save()
-
-        tags = [Tag.objects.get_or_create(**tag_data)[0]
-                for tag_data in tags_data]
-        recipe.tags.set(tags)
-
-        for ingredient_data in ingredients_data:
-            ingredient, created = Ingredient.objects.get_or_create(
-                **ingredient_data['ingredient'])
-            quantity, created = Quantity.objects.update_or_create(
-                recipe=recipe, ingredient=ingredient, defaults=ingredient_data
-            )
-
+        recipe = Recipe.objects.create(**validated_data)
+        self.process_tags_and_ings(recipe, tags_data, ingredients_data)
         return recipe
 
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipe', [])
-
-        instance.name = validated_data.get('name', instance.name)
-        instance.image = validated_data.get('image', instance.image)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time',
-                                                   instance.cooking_time)
-
-        tags = [Tag.objects.get_or_create(**tag_data)[0]
-                for tag_data in tags_data]
-        instance.tags.set(tags)
-
-        for ingredient_data in ingredients_data:
-            ingredient, created = Ingredient.objects.get_or_create(
-                **ingredient_data['ingredient'])
-            quantity, created = Quantity.objects.update_or_create(
-                recipe=instance, ingredient=ingredient,
-                defaults=ingredient_data)
-
-        instance.save()
+        self.process_tags_and_ings(instance, tags_data, ingredients_data)
+        super().update(instance, validated_data)
         return instance
 
 
