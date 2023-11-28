@@ -26,9 +26,6 @@ class UserViewSet(UserViewSet):
     def subscribe(self, request, id):
         user = request.user
         follow_author = get_object_or_404(User, id=id)
-        if follow_author == user:
-            return Response({"log": "Вы не можете подписаться на себя"},
-                            status=HTTP_400_BAD_REQUEST)
         follow_instance, created = Follow.objects.get_or_create(
             user=user, following=follow_author)
         if request.method == 'POST':
@@ -42,9 +39,8 @@ class UserViewSet(UserViewSet):
         if Follow.objects.filter(user=user, following=follow_author).exists():
             Follow.objects.filter(user=user, following=follow_author).delete()
             return Response({"log": "Вы отписались"}, status=HTTP_200_OK)
-        else:
-            return Response({"log": "Вы не подписаны на пользователя"},
-                            status=HTTP_400_BAD_REQUEST)
+        return Response({"log": "Вы не подписаны на пользователя"},
+                        status=HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated])

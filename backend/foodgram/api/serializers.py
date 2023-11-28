@@ -1,5 +1,4 @@
 from django.db import transaction
-
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
@@ -105,19 +104,16 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
-    def validate_recipe(self, value):
+    def validate(self, data):
+        validated_data = super().validate(data)
+        recipe = validated_data.get('recipe', [])
         ingredient_names = set()
-        for ingredient_data in value:
+        for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
             if ingredient_name in ingredient_names:
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
-        return value
-
-    def validate(self, data):
-        validated_data = super().validate(data)
-        self.validate_recipe(validated_data.get('recipe', []))
         return validated_data
 
     class Meta:
