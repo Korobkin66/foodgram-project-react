@@ -100,13 +100,13 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                           source='recipe')
+                                           source='recipes')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
     def validate(self, data):
         validated_data = super().validate(data)
-        recipe = validated_data.get('recipe', [])
+        recipe = validated_data.get('recipes', [])
         ingredient_names = set()
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
@@ -156,7 +156,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
-        ingredients_data = validated_data.pop('recipe', [])
+        ingredients_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
         recipe = Recipe.objects.create(**validated_data)
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
@@ -164,7 +164,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags', [])
-        ingredients_data = validated_data.pop('recipe', [])
+        ingredients_data = validated_data.pop('recipes', [])
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
         super().update(instance, validated_data)
         return instance
@@ -175,9 +175,9 @@ class FavoriteSerializer(serializers.Serializer):
                                             write_only=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
                                    required=False)
-    name = serializers.CharField(source='recipe.name', read_only=True)
-    image = serializers.ImageField(source='recipe.image', read_only=True)
-    cooking_time = serializers.DurationField(source='recipe.cooking_time',
+    name = serializers.CharField(source='recipes.name', read_only=True)
+    image = serializers.ImageField(source='recipes.image', read_only=True)
+    cooking_time = serializers.DurationField(source='recipes.cooking_time',
                                              read_only=True)
 
     def create(self, validated_data):
