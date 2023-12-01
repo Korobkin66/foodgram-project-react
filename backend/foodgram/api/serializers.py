@@ -119,7 +119,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
-                  'cooking_time', 'recipe')
+                  'cooking_time')
         model = Recipe
 
     def get_is_favorited(self, obj):

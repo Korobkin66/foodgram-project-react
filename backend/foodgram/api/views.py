@@ -80,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = serializer_class(data={'user': user.id,
-                                                'recipe': recipe.id},
+                                                'recipes': recipe.id},
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
