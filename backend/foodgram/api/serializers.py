@@ -98,7 +98,7 @@ class MaxiIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
-    author = UserSerializer(read_only=True)
+    author = BaseUserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
                                            source='recipes')
     is_favorited = SerializerMethodField()
