@@ -182,14 +182,14 @@ class FavoriteSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = validated_data.get('user', self.context['request'].user)
-        recipe = validated_data['id']
+        recipe = validated_data['id'].id
         favorite, created = Favorite.objects.get_or_create(user=user,
                                                            recipe=recipe)
         return favorite
 
     def delete(self, validated_data):
         user = validated_data.get('user', self.context['request'].user)
-        recipe = validated_data['id']
+        recipe = validated_data['id'].id
         favorite = Favorite.objects.get(user=user, recipe=recipe)
         favorite.delete()
 
