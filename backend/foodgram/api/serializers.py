@@ -197,6 +197,7 @@ class FavoriteSerializer(serializers.Serializer):
 class ShoppingCartSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
                                    required=False)
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
 
     class Meta:
         fields = '__all__'

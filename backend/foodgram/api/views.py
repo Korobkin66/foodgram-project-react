@@ -46,11 +46,9 @@ class UserViewSet(UserViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request, id=None):
         queryset = Follow.objects.filter(user=request.user)
-        serializer = FollowSerializer(
-            queryset,
-            many=True,
-            context={'request': request}
-        )
+        followed_users = queryset.values_list('following', flat=True)
+        users = User.objects.filter(id__in=followed_users)
+        serializer = BaseUserSerializer(users, many=True, context={'request': request})
         return Response(serializer.data, status=HTTP_200_OK)
 
 
