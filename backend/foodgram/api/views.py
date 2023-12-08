@@ -78,8 +78,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         
 
         if request.method == 'POST':
-            serializer_class(data={'id': recipe.id, 'user': user},
-                              context={"request": request})
+            serializer = serializer_class(data={
+                'id': recipe.id, 
+                'user': user},
+                context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             response_data = {"log": "Рецепт успешно добавлен в список."}
