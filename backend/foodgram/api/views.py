@@ -48,7 +48,7 @@ class UserViewSet(UserViewSet):
         queryset = Follow.objects.filter(user=request.user)
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
-        serializer = BaseUserSerializer(users, many=True, context={'request': request})
+        serializer = FollowSerializer(users, many=True, context={'request': request})
         return Response(serializer.data, status=HTTP_200_OK)
 
 
@@ -75,11 +75,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
+        
 
         if request.method == 'POST':
-            serializer = serializer_class(data={'user': user,
-                                                'recipes': recipe},
-                                          context={"request": request})
+            serializer_class(data={'id': recipe.id, 'user': user},
+                              context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             response_data = {"log": "Рецепт успешно добавлен в список."}
