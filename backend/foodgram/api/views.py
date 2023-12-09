@@ -81,7 +81,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = serializer_class(data={
                 'id': recipe.id, 
                 'user': user,
-                'recipes': [{'ingredient': {'name': 'Мука',
+                'recipe': [{'ingredient': {'name': 'Мука',
                 'unit': 'г', 'amount': 200}}],},
                 context={"request": request})
             serializer.is_valid(raise_exception=True)
