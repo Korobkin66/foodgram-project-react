@@ -20,6 +20,7 @@ services:
     depends_on:
       - db
     restart: on-failure
+    hostname: backend
   frontend:
     image: korobkin66/foodgram_frontend 
     env_file: .env
