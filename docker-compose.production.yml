@@ -1,7 +1,7 @@
 version: '3'
 
-networks:
-  common_network:
+# networks:
+#   common_network:
 
 volumes:
   pg_data_production:
@@ -14,8 +14,8 @@ services:
     env_file: .env
     volumes:
       - pg_data_production:/var/lib/postgresql/data
-    networks:
-      - common_network
+    # networks:
+    #   - common_network
   backend:
     image: korobkin66/foodgram_backend
     env_file: .env
@@ -25,8 +25,8 @@ services:
     depends_on:
       - db
     restart: on-failure
-    networks:
-      - common_network
+    # networks:
+    #   - common_network
     # hostname: backend
   frontend:
     image: korobkin66/foodgram_frontend 
@@ -34,12 +34,12 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
-    networks:
-      - common_network
+    # networks:
+    #   - common_network
   nginx:
     image: nginx:1.19.3
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - ./frontend/build:/usr/share/nginx/html/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
@@ -49,5 +49,5 @@ services:
       - media:/usr/share/nginx/html/media/
     depends_on:
       - backend
-    networks:
-      - common_network
+    # networks:
+    #   - common_network
