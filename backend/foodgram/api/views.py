@@ -13,7 +13,7 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
-                          TagSerializer)
+                          TagSerializer, MiniRecipesSerializer)
 from .services import get_shopping_cart
 
 
@@ -48,7 +48,8 @@ class UserViewSet(UserViewSet):
         queryset = Follow.objects.filter(user=request.user)
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
-        serializer = FollowSerializer(users, many=True, context={'request': request})
+        serializer = FollowSerializer(users, many=True,
+                                      context={'request': request})
         return Response(serializer.data, status=HTTP_200_OK)
 
 
@@ -79,12 +80,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = serializer_class(data={
-                'recipe': recipe.id,
+                'id': recipe.id,
                 'user': user},
                 context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            response_data = {"log": "Рецепт успешно добавлен в список."}
+            response_data = serializer.data
             status_code = HTTP_201_CREATED
         else:
             if model.objects.filter(user=user, recipe=recipe).exists():
@@ -99,8 +100,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
-        return self.fav_or_shop_metod(request, pk,
-                                      Favorite, FavoriteSerializer)
+        recipe = get_object_or_404(Recipe, id=pk)
+        self.fav_or_shop_metod(request, pk, Favorite, FavoriteSerializer)
+        serializer = MiniRecipesSerializer(recipe)
+        return Response(serializer.data, status=HTTP_201_CREATED)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
