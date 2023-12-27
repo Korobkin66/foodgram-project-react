@@ -80,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = serializer_class(data={
-                # 'id': recipe.id,
+                'id': recipe.id,
                 'recipe': recipe.id,
                 'user': user},
                 context={"request": request})
@@ -121,6 +121,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         shopping_cart = get_shopping_cart(request)
+        print(shopping_cart)
         response = HttpResponse(shopping_cart,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'
