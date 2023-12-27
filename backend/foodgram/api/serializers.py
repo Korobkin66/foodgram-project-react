@@ -206,6 +206,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         model = ShoppingCart
 
     def to_representation(self, data):
-        print(data)
+        print('data', data)
         return MiniRecipesSerializer(
             data, context={'request': self.context.get('request')}).data
