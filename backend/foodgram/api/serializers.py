@@ -64,7 +64,8 @@ class FollowSerializer(UserSerializer):
     recipes_count = SerializerMethodField()
 
     class Meta(BaseUserSerializer.Meta):
-        fields = ('recipes', 'recipes_count')
+       fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                  'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
         user = self.context.get('request').user
@@ -100,7 +101,7 @@ class MaxiIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
-    ingredients = MaxiIngredientSerializer(read_only=True, many=True,
+    ingredient = MaxiIngredientSerializer(read_only=True, many=True,
                                            source='recipes')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -118,7 +119,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return validated_data
 
     class Meta:
-        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
+        fields = ('id', 'tags', 'author', 'ingredient', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
         model = Recipe
