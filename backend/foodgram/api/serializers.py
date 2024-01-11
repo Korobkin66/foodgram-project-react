@@ -123,6 +123,12 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
         model = Recipe
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['ingredients'] = MaxiIngredientSerializer(
+            instance.recipes.all(), many=True).data
+        return representation
 
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
