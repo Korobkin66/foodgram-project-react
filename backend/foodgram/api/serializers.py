@@ -102,7 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                           source='ingredients')
+                                           source='recipes')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
