@@ -126,7 +126,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ingredients'] = MaxiIngredientSerializer(
+        representation['ingredients'] = MiniRecipesSerializer(
             instance.ingredients.all(), many=True).data
         return representation
 
@@ -158,8 +158,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
             quantities_to_create = [Quantity(
                 recipe=instance,
-                ingredient=created_ingredients[i],
-                **ingredient_data) for i, ingredient_data in enumerate(ingredients_data)]
+                ingredient=ingredients[ingredient_data['ingredient']['name']],
+                **ingredient_data) for ingredient_data in ingredients_data]
             Quantity.objects.bulk_create(quantities_to_create)
 
     def create(self, validated_data):
