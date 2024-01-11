@@ -64,7 +64,7 @@ class FollowSerializer(UserSerializer):
     recipes_count = SerializerMethodField()
 
     class Meta(BaseUserSerializer.Meta):
-       fields = ('id', 'username', 'first_name', 'last_name', 'email',
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
@@ -123,7 +123,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
         model = Recipe
-    
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['ingredients'] = MiniRecipesSerializer(

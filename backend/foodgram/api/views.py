@@ -76,7 +76,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        
 
         if request.method == 'POST':
             serializer = serializer_class(data={
@@ -102,7 +101,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        return self.fav_or_shop_metod(request, pk, Favorite, FavoriteSerializer)
+        return self.fav_or_shop_metod(request, pk, Favorite,
+                                      FavoriteSerializer)
         serializer = MiniRecipesSerializer(recipe)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
