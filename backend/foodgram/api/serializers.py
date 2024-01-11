@@ -126,7 +126,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ingredients'] = MiniRecipesSerializer(
+        representation['ingredients'] = MaxiIngredientSerializer(
             instance.ingredients.all(), many=True).data
         return representation
 
