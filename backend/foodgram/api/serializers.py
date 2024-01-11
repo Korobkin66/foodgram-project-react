@@ -102,7 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                           source='recipes')
+                                           source='ingredients')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
@@ -124,11 +124,11 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
         model = Recipe
     
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['ingredients'] = MaxiIngredientSerializer(
-            instance.recipes.all(), many=True).data
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['ingredients'] = MaxiIngredientSerializer(
+    #         instance.recipes.all(), many=True).data
+    #     return representation
 
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
