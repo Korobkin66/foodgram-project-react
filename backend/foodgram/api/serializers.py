@@ -153,17 +153,40 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = {ingredient_data['ingredient']['name']:
                            Ingredient(**ingredient_data['ingredient'])
                            for ingredient_data in ingredients_data}
+            # Ingredient.objects.bulk_create(list(ingredients.values()),
+            #                                ignore_conflicts=True)
+
+            # quantities_to_create = [Quantity(
+            #     recipe=instance,
+            #     ingredient=ingredients[ingredient_data['ingredient']['name']],
+            #     **ingredient_data) for ingredient_data in ingredients_data]
+            # Quantity.objects.bulk_create(quantities_to_create)
 
             created_ingredients = Ingredient.objects.bulk_create(
                 list(ingredients.values()), ignore_conflicts=True,
                 returning=('id',))
+            
+            ingredients_mapping = {ingredient.name: ingredient.id
+                               for ingredient in created_ingredients}
 
             quantities_to_create = [Quantity(
                 recipe=instance,
-                ingredient_id=created_ingredient.id,
-                **ingredient_data) for created_ingredient, ingredient_data
-                in zip(created_ingredients, ingredients_data)]
+                ingredient_id=ingredients_mapping[
+                    ingredient_data['ingredient']['name']],
+                **ingredient_data) for ingredient_data in ingredients_data]
             Quantity.objects.bulk_create(quantities_to_create)
+
+            tags_mapping = {tag_data['name']:
+                            tag.id for tag_data, tag in zip(tags_data, tags)}
+
+            instance.tags.set(tags_mapping.values())
+
+            # quantities_to_create = [Quantity(
+            #     recipe=instance,
+            #     ingredient_id=created_ingredient.id,
+            #     **ingredient_data) for created_ingredient, ingredient_data
+            #     in zip(created_ingredients, ingredients_data)]
+            # Quantity.objects.bulk_create(quantities_to_create)
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
