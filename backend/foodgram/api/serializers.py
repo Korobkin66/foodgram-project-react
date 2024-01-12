@@ -153,17 +153,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = {ingredient_data['ingredient']['name']:
                            Ingredient(**ingredient_data['ingredient'])
                            for ingredient_data in ingredients_data}
-            # Ingredient.objects.bulk_create(list(ingredients.values()),
-            #                                ignore_conflicts=True)
-
-            # quantities_to_create = [Quantity(
-            #     recipe=instance,
-            #     ingredient=ingredients[ingredient_data['ingredient']['name']],
-            #     **ingredient_data) for ingredient_data in ingredients_data]
-            # Quantity.objects.bulk_create(quantities_to_create)
 
             created_ingredients = Ingredient.objects.bulk_create(
-                list(ingredients.values()), ignore_conflicts=True, returning=('id',))
+                list(ingredients.values()), ignore_conflicts=True,
+                returning=('id',))
 
             quantities_to_create = [Quantity(
                 recipe=instance,
