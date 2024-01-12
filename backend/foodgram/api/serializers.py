@@ -102,7 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                           source='recipes')
+                                           source='quantity_set')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
@@ -171,9 +171,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
             quantities_to_create = [Quantity(
                 recipe=instance,
-                ingredient_id=ingredients_mapping[
-                    ingredient_data['ingredient']['name']],
-                **ingredient_data) for ingredient_data in ingredients_data]
+                ingredient=created_ingredients[i],
+                **ingredient_data) for i, ingredient_data in enumerate(ingredients_data)]
             Quantity.objects.bulk_create(quantities_to_create)
 
             tags_mapping = {tag_data['name']:
