@@ -81,11 +81,11 @@ class FollowSerializer(BaseUserSerializer):
             )
         return obj
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-        following_user = self.instance
-        follow = Follow.objects.create(user=user, following=following_user)
-        return follow
+    # def create(self, validated_data):
+    #     user = self.context['request'].user
+    #     following_user = self.instance
+    #     follow = Follow.objects.create(user=user, following=following_user)
+    #     return follow
 
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
