@@ -185,24 +185,26 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         validated_data = super().validate(data)
-        recipe = validated_data.get('recipes', [])
+        recipes = validated_data.get('recipes', [])
         ingredient_names = set()
-        for ingredient_data in recipe:
-            ingredient_name = ingredient_data['ingredient']['name']
+
+        for recipe_data in recipes:
+            ingredient_name = recipe_data['ingredient']['name']
             if ingredient_name in ingredient_names:
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
+
         return validated_data
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
-        ingredients_data = validated_data.pop('recipes', [])
+        recipes_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
 
         with transaction.atomic():
             recipe = Recipe.objects.create(**validated_data)
-            self.process_tags_and_ings(recipe, tags_data, ingredients_data)
+            self.process_tags_and_ings(recipe, tags_data, recipes_data)
 
         return recipe
 
