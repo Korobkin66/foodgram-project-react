@@ -146,25 +146,18 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def process_tags_and_ings(self, instance, tags_data, ingredients_data):
         with transaction.atomic():
-            tags_to_create = [Tag(**tag_data) for tag_data in tags_data]
-            tags = Tag.objects.bulk_create(tags_to_create)
+            tags = [Tag.objects.get(id=tag_id) for tag_id in tags_data]
             instance.tags.set(tags)
 
-            # ingredients = {ingredient_data['ingredient']['name']:
-            #                Ingredient(**ingredient_data['ingredient'])
-            #                for ingredient_data in ingredients_data}
-
-            for ingredient in ingredients_data:
-                Quantity.objects.create(
-                    recipe=instance,
-                    ingredient=ingredient.get('id'),
-                    amount=ingredient.get('amount'),
-                )
-
-            # tags_mapping = {tag_data['name']:
-            #                 tag.id for tag_data, tag in zip(tags_data, tags)}
-
-            # instance.tags.set(tags_mapping.values())
+            ingredients = []
+            for ingredient_data in ingredients_data:
+                ingredient_id = ingredient_data.get('id')
+                amount = ingredient_data.get('amount')
+                ingredient = Ingredient.objects.get(id=ingredient_id)
+                ingredients.append(Quantity(recipe=instance,
+                                            ingredient=ingredient,
+                                            amount=amount))
+            Quantity.objects.bulk_create(ingredients)
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
@@ -218,6 +211,5 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         model = ShoppingCart
 
     def to_representation(self, data):
-        print('data', data)
         return MiniRecipesSerializer(
             data, context={'request': self.context.get('request')}).data
