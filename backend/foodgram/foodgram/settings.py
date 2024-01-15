@@ -3,6 +3,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import logging
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -141,4 +143,18 @@ DJOSER = {
         "user": "api.serializers.UserSerializer",
         "user_create": "api.serializers.CustomUserCreateSerializer",
     },
+}
+
+LOGGING = {
+   'version': 1,
+   'disable_existing_loggers': False,
+   'handlers': {
+       'console': {
+           'class': 'logging.StreamHandler',
+       },
+   },
+   'root': {
+       'handlers': ['console'],
+       'level': 'DEBUG',
+   },
 }
