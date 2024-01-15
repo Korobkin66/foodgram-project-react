@@ -246,7 +246,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 # тут конец
 
 
-class FavoriteSerializer(serializers.Serializer):
+class FavoriteSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all(),
                                             write_only=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
@@ -270,6 +270,10 @@ class FavoriteSerializer(serializers.Serializer):
         recipe = Recipe.objects.get(id=recipe_id)
         favorite = Favorite.objects.get(user=user, recipe=recipe)
         favorite.delete()
+    
+    class Meta:
+        fields = '__all__'
+        model = Favorite
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
