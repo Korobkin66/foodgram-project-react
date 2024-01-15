@@ -69,7 +69,7 @@ class FollowSerializer(BaseUserSerializer):
 
     def get_recipes_count(self, obj):
         user = self.context.get('request').user
-        return Recipe.objects.filter(user=user).count()
+        return Recipe.objects.filter(author=user, shoppingcart__user=user).distinct().count()
 
     def validate(self, obj):
         author = self.instance
