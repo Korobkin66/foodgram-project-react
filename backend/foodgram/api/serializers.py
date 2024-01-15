@@ -69,7 +69,7 @@ class FollowSerializer(BaseUserSerializer):
 
     def get_recipes_count(self, obj):
         current_user = self.context.get('request').user
-        print(f"User: {current_user}, Author: {obj}, Recipes Count: {recipes_count}")python manage.py shell
+        print(f"User: {current_user}, Author: {obj}, Recipes Count: {recipes_count}")
         return Recipe.objects.filter(author=obj, shoppingcart__user=current_user).distinct().count()
 
     def validate(self, obj):
@@ -272,6 +272,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault(),
                                    required=False)
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+    print(queryset)
 
     class Meta:
         fields = '__all__'
