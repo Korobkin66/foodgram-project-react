@@ -1,4 +1,5 @@
 from django.db import transaction
+import logging
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
@@ -9,6 +10,9 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
+
+
+logger = logging.getLogger(__name__)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -156,14 +160,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
-            print('ingredients', ingredients)
+            logger.info('ingredients', ingredients)
             Quantity.objects.bulk_create(ingredients)
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
-        print('ingredients_data', ingredients_data)
+        logger.info('ingredients_data', ingredients_data)
         recipe = Recipe.objects.create(**validated_data)
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
         return recipe
