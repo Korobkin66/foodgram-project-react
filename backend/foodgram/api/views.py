@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -66,6 +67,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = IngredientFilter
+    filter_backends = (DjangoFilterBackend, )
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -76,6 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         'partial_update': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
         'destroy': [IsAuthorOrReadOnly, IsAdminOrReadOnly]}
     filterset_class = RecipeFilter
+    filter_backends = (DjangoFilterBackend, )
 
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
