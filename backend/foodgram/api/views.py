@@ -15,7 +15,7 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, MiniRecipesSerializer)
 from .services import get_shopping_cart
-from .filter import RecipeFilter
+from .filter import RecipeFilter, IngredientFilter
 
 
 class UserViewSet(UserViewSet):
@@ -64,6 +64,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
