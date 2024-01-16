@@ -49,9 +49,10 @@ class UserViewSet(UserViewSet):
         queryset = Follow.objects.filter(user=request.user)
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
-        serializer = FollowSerializer(users, many=True,
+        data = self.paginate_queryset(users)
+        serializer = FollowSerializer(data, many=True,
                                       context={'request': request})
-        return Response(serializer.data, status=HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
 
 
 class TagViewSet(viewsets.ModelViewSet):
