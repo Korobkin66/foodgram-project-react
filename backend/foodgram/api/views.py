@@ -15,6 +15,7 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, MiniRecipesSerializer)
+from .pagination import MyPagination
 from .services import get_shopping_cart
 from .filter import RecipeFilter, IngredientFilter
 
@@ -22,6 +23,7 @@ from .filter import RecipeFilter, IngredientFilter
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = BaseUserSerializer
+    pagination_class = MyPagination
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
@@ -60,6 +62,7 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAdminOrReadOnly]
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -68,6 +71,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = IngredientFilter
     filter_backends = (DjangoFilterBackend, )
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -79,6 +83,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         'destroy': [IsAuthorOrReadOnly, IsAdminOrReadOnly]}
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend, )
+    pagination_class = MyPagination
 
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
