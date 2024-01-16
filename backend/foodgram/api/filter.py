@@ -3,8 +3,6 @@ from django_filters import FilterSet, filters
 
 from recipes.models import Recipe
 
-User = get_user_model()
-
 
 class RecipeFilter(FilterSet):
     is_favorited = filters.BooleanFilter(
