@@ -154,7 +154,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
-            logger.info('ingredient_data', ingredient_data)
+                logger.info('ingredient_data', ingredient_data)
             Quantity.objects.bulk_create(ingredients)
 
     @transaction.atomic
