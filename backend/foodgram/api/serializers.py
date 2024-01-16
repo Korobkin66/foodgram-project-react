@@ -100,8 +100,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = BaseUserSerializer(read_only=True)
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
                                            source='quantity_set')
-    is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    # is_favorited = SerializerMethodField()
+    # is_in_shopping_cart = SerializerMethodField()
 
     def validate(self, data):
         validated_data = super().validate(data)
@@ -127,19 +127,19 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.ingredients.all(), many=True).data
         return representation
 
-    def get_is_favorited(self, obj):
-        current_user = self.context['request'].user
-        if current_user.is_authenticated:
-            return Favorite.objects.filter(user=current_user,
-                                           recipe=obj.id).exists()
-        return False
+    # def get_is_favorited(self, obj):
+    #     current_user = self.context['request'].user
+    #     if current_user.is_authenticated:
+    #         return Favorite.objects.filter(user=current_user,
+    #                                        recipe=obj.id).exists()
+    #     return False
 
-    def get_is_in_shopping_cart(self, obj):
-        cart_user = self.context['request'].user
-        if cart_user.is_authenticated:
-            return ShoppingCart.objects.filter(user=cart_user,
-                                               recipe=obj.id).exists()
-        return False
+    # def get_is_in_shopping_cart(self, obj):
+    #     cart_user = self.context['request'].user
+    #     if cart_user.is_authenticated:
+    #         return ShoppingCart.objects.filter(user=cart_user,
+    #                                            recipe=obj.id).exists()
+    #     return False
 
     def process_tags_and_ings(self, instance, tags_data, ingredients_data):
         with transaction.atomic():
