@@ -15,6 +15,7 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, MiniRecipesSerializer)
 from .services import get_shopping_cart
+from .filter import RecipeFilter
 
 
 class UserViewSet(UserViewSet):
@@ -72,6 +73,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         'create': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
         'partial_update': [IsAuthorOrReadOnly, IsAdminOrReadOnly],
         'destroy': [IsAuthorOrReadOnly, IsAdminOrReadOnly]}
+    filterset_class = RecipeFilter
 
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
