@@ -1,5 +1,5 @@
-from django.db import transaction
 import logging
+from django.db import transaction
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
@@ -10,7 +10,6 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
-
 
 logger = logging.getLogger(__name__)
 

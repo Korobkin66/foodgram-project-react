@@ -1,7 +1,11 @@
 from django.contrib.auth import get_user_model
 from django_filters import FilterSet, CharFilter, filters
 
+import logging
+
 from recipes.models import Recipe, Tag, Ingredient
+
+logger = logging.getLogger(__name__)
 
 
 class RecipeFilter(FilterSet):
@@ -16,17 +20,22 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
+    author = filters.ModelChoiceFilter(
+        queryset=User.objects.all(),
+    )
 
     class Meta:
         model = Recipe
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
     def get_is_favorited(self, queryset, name, value):
+        logger.info('queryset_favorite', queryset)
         if self.request.user.is_authenticated and value:
             return queryset.filter(favorites__user=self.request.user)
         return queryset
     
     def get_is_in_shopping_cart(self, queryset, name, value):
+        logger.info('queryset_shopcart', queryset)
         if self.request.user.is_authenticated and value:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
