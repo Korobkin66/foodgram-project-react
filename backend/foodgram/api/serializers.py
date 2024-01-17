@@ -118,13 +118,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
-        validate_data.update(
+        validated_data.update(
             {
                 "tags": tags,
                 "ingredients": ingredients
             }
         )
-        return validate_data
+        return validated_data
 
     class Meta:
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
