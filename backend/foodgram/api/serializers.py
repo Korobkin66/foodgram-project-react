@@ -170,21 +170,25 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        logger.info(f'validated_data {validated_data}')
-        logger.info(f'self {self}')
+        logger.info(f'validated_data {validated_data}')  #validated_data
+        logger.info(f'self {self}')  #self
         tags_data = validated_data.pop('tags', [])
-        logger.info(f'tags_data {tags_data}')
+        logger.info(f'tags_data {tags_data}')  #tags_data
         ingredients_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
-        logger.info(f'ingredients_data {ingredients_data}')
+        logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         recipe = Recipe.objects.create(**validated_data)
+        logger.info(f'recipe_update {recipe}')  #recipe
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        logger.info(f'instance_update {instance}')  #instance_update
+        logger.info(f'validated_data_update {validated_data}')  #validated_data_update
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipes', [])
+        logger.info(f'ingredients_data_udate {ingredients_data}')  #ingredients_data_udate
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
         super().update(instance, validated_data)
         return instance
