@@ -163,6 +163,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         logger.info(f'validated_data {validated_data}')
+        logger.info(f'self {self}')
         tags_data = validated_data.pop('tags', [])
         logger.info(f'tags_data {tags_data}')
         ingredients_data = validated_data.pop('recipes', [])

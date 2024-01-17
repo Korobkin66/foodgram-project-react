@@ -29,7 +29,9 @@ class RecipeFilter(FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         logger.info('queryset_favorite', queryset)
+        logger.info('value', value)
         if self.request.user.is_authenticated and value:
+            logger.info('попался!')
             return queryset.filter(favorites__user=self.request.user)
         return queryset
     
