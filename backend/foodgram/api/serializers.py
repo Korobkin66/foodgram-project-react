@@ -1,4 +1,5 @@
 import logging
+from drf_extra_fields.fields import Base64ImageField
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
@@ -101,6 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                                            source='quantity_set')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
+    image =  Base64ImageField()
 
     def validate(self, data):
         validated_data = super().validate(data)
