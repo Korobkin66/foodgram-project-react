@@ -85,6 +85,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     pagination_class = MyPagination
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Recipe.objects.all()
+
+        if self.action == 'list' and user.is_authenticated:
+            # Возвращаем только избранные рецепты для текущего пользователя
+            queryset = queryset.filter(favorites__user=user)
+
+        return queryset
+
     def fav_or_shop_metod(self, request, pk, model, serializer_class):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
