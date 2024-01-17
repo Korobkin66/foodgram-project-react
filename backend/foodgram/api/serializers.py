@@ -18,12 +18,14 @@ logger = logging.getLogger(__name__)
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
+        read_only_fields = ("__all__",)
         model = Tag
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
+        read_only_fields = ("__all__",)
         model = Ingredient
 
 
@@ -160,7 +162,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        logger.info(f'validated_data {validated_data}')
         tags_data = validated_data.pop('tags', [])
+        logger.info(f'tags_data {tags_data}')
         ingredients_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
         logger.info(f'ingredients_data {ingredients_data}')
