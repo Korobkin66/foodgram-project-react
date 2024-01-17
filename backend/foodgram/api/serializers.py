@@ -155,7 +155,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
-            logger.info(f'ingredient_data {ingredient_data}')
+            logger.info(f'ingredients_data {ingredients_data}')
             Quantity.objects.bulk_create(ingredients)
 
     @transaction.atomic
@@ -163,7 +163,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipes', [])
         validated_data['author'] = self.context['request'].user
-        logger.info(f'validated_data {validated_data}')
+        logger.info(f'ingredients_data {ingredients_data}')
         recipe = Recipe.objects.create(**validated_data)
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
         return recipe
