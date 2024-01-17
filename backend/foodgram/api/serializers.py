@@ -109,6 +109,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         recipe = validated_data.get('recipes', [])
+        tags = self.initial_data.get("tags")
+        ingredients = self.initial_data.get("ingredients")
         ingredient_names = set()
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
@@ -116,7 +118,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
-        return validated_data
+        validate_data.update(
+            {
+                "tags": tags,
+                "ingredients": ingredients
+            }
+        )
+        return validate_data
 
     class Meta:
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
