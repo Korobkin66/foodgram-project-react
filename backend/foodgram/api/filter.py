@@ -4,6 +4,7 @@ from django_filters import FilterSet, CharFilter, filters
 import logging
 
 from recipes.models import Recipe, Tag, Ingredient
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
