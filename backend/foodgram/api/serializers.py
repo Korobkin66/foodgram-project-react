@@ -174,7 +174,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         # logger.info(f'self {self}')  #self
         tags_data = validated_data.pop('tags', [])
         logger.info(f'tags_data {tags_data}')  #tags_data
-        ingredients_data = validated_data.pop('recipes', [])
+        ingredients_data = validated_data.pop('ingredients', [])
         validated_data['author'] = self.context['request'].user
         logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         recipe = Recipe.objects.create(**validated_data)
