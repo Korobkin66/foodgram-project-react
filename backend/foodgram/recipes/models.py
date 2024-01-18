@@ -47,8 +47,10 @@ class Recipe(models.Model):
     )
     text = models.TextField(help_text='Введите описание рецепта',
                             verbose_name='Описание рецепта')
-    ingredients = models.ManyToManyField(Ingredient, related_name='recipes',
-                                         verbose_name='Ингредиент')
+    # ingredients = models.ManyToManyField(Ingredient, related_name='recipes',
+    #                                      verbose_name='Ингредиент')
+    quantities = models.ManyToManyField('Quantity', related_name='recipes',
+                                        verbose_name='Количество ингредиентов')
     tags = models.ManyToManyField(Tag, related_name='recipes',
                                   verbose_name='Тэг')
     cooking_time = models.IntegerField(
