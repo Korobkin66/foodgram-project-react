@@ -100,10 +100,10 @@ class MaxiIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
-    # ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-    #                                        source='quantity_set')
     ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                          source='quantities')
+                                           source='quantity_set')
+    # quantities = MaxiIngredientSerializer(read_only=True, many=True,
+    #                                       source='quantities')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image =  Base64ImageField()
