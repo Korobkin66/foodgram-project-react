@@ -168,6 +168,29 @@ class RecipeSerializer(serializers.ModelSerializer):
             logger.info(f'ingredients_data {ingredients_data}')
             Quantity.objects.bulk_create(ingredients)
 
+    def ingredients(self, instance, ingredients_data):
+        existing_ingredient_ids = set(
+            instance.ingredients.values_list('ingredient', flat=True)
+        )
+        new_ingredient_ids = set(ingredient_data['id'] for ingredient_data in ingredients_data)
+        deleted_ingredient_ids = existing_ingredient_ids - new_ingredient_ids
+
+        # Удаление ингредиентов, которых уже нет в новых данных
+        instance.ingredients.filter(ingredient_id__in=deleted_ingredient_ids).delete()
+
+        # Добавление новых связей с ингредиентами
+        for ingredient_data in ingredients_data:
+            ingredient_id = ingredient_data['id']
+            amount = ingredient_data['amount']
+            ingredient, created = Quantity.objects.get_or_create(
+                recipe=instance,
+                ingredient_id=ingredient_id,
+                defaults={'amount': amount}
+            )
+            if not created:
+                ingredient.amount = amount
+                ingredient.save()
+
     @transaction.atomic
     def create(self, validated_data):
         logger.info(f'validated_data {validated_data}')  #validated_data
@@ -180,6 +203,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         logger.info(f'recipe_update {recipe}')  #recipe
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
+        self.ingredients(recipe, ingredients_data) # это новая строка добавленная с def ingredients
         return recipe
 
     @transaction.atomic
@@ -190,7 +214,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients', [])
         logger.info(f'ingredients_data_udate {ingredients_data}')  #ingredients_data_udate
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
+        self.ingredients(instance, ingredients_data)  # это новая строка добавленная с def ingredients
         super().update(instance, validated_data)
+        logger.info(f'instance_update {instance}')
         return instance
 
 

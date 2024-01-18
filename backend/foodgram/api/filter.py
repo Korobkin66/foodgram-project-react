@@ -32,13 +32,18 @@ class RecipeFilter(FilterSet):
         logger.info('value', value)
         if self.request.user.is_authenticated:  # and value:
             logger.info('попался!')
-            return queryset.filter(favorites__user=self.request.user)
+            filter_fav_result = queryset.filter(favorites__user=self.request.user)
+            logger.info(f'filter_fav_result, {filter_fav_result}')
+            return filter_fav_result
         return queryset
     
     def get_is_in_shopping_cart(self, queryset, name, value):
         logger.info('queryset_shopcart', queryset)
         if self.request.user.is_authenticated:  # and value:
-            return queryset.filter(shopping_cart__user=self.request.user)
+            filter_sc_result = queryset.filter(shopping_cart__user=self.request.user)
+            logger.info(f'filter_sc_result, {filter_sc_result}')
+            return filter_sc_result
+            # return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
 
 
