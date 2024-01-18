@@ -188,9 +188,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         logger.info(f'validated_data {validated_data}')  #validated_data
         # logger.info(f'self {self}')  #self
-        tags_data = validated_data.get('tags', [])
+        tags_data = validated_data.pop('tags', [])
         logger.info(f'tags_data {tags_data}')  #tags_data
-        ingredients_data = validated_data.get('ingredients', [])
+        ingredients_data = validated_data.pop('ingredients', [])
         validated_data['author'] = self.context['request'].user
         logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         recipe = Recipe.objects.create(**validated_data)
@@ -203,8 +203,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         logger.info(f'instance_update {instance}')  #instance_update
         logger.info(f'validated_data_update {validated_data}')  #validated_data_update
-        tags_data = validated_data.get('tags', [])
-        ingredients_data = validated_data.get('ingredients', [])
+        tags_data = validated_data.pop('tags', [])
+        ingredients_data = validated_data.pop('ingredients', [])
         logger.info(f'ingredients_data_udate {ingredients_data}')  #ingredients_data_udate
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
         # self.ingredients(instance, ingredients_data)  # это новая строка добавленная с def ingredients
