@@ -134,9 +134,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
         model = Recipe
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        return MiniRecipesSerializer(instance, many=True).data
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     return MiniRecipesSerializer(instance, many=True).data
 
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
