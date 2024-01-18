@@ -169,14 +169,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             Quantity.objects.bulk_create(ingredients)
 
     def ingredients(self, instance, ingredients_data):
-        existing_ingredient_ids = set(
-            instance.ingredients.values_list('ingredient', flat=True)
-        )
-        new_ingredient_ids = set(ingredient_data['id'] for ingredient_data in ingredients_data)
-        deleted_ingredient_ids = existing_ingredient_ids - new_ingredient_ids
+        # existing_ingredient_ids = set(
+        #     instance.ingredients.values_list('ingredient', flat=True)
+        # )
+        # new_ingredient_ids = set(ingredient_data['id'] for ingredient_data in ingredients_data)
+        # deleted_ingredient_ids = existing_ingredient_ids - new_ingredient_ids
 
-        # Удаление ингредиентов, которых уже нет в новых данных
-        instance.ingredients.filter(ingredient_id__in=deleted_ingredient_ids).delete()
+        # # Удаление ингредиентов, которых уже нет в новых данных
+        # instance.ingredients.filter(ingredient_id__in=deleted_ingredient_ids).delete()
 
         # Добавление новых связей с ингредиентами
         for ingredient_data in ingredients_data:
