@@ -111,6 +111,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = validated_data.get('recipes', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
+        logger.info(f'ingredients_val {ingredients}')  #ingredients_val
         ingredient_names = set()
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
@@ -124,6 +125,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 "ingredients": ingredients
             }
         )
+        logger.info(f'validated_data_val {validated_data}')  #validated_data_val
         return validated_data
 
     class Meta:
