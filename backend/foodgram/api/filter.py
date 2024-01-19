@@ -57,7 +57,8 @@ class RecipeFilter(FilterSet):
         logger.info('value_sc', value)
         user = self.request.user
         if value and not user.is_anonymous:
-            return queryset.filter(shopping_cart__user=user)
+            filter_sc_result = queryset.filter(shopping_cart__user=user)[:4]
+            return filter_sc_result
         return queryset
 
 
