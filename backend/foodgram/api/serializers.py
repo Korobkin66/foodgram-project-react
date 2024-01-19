@@ -134,11 +134,11 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
         model = Recipe
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['ingredients'] = MiniRecipesSerializer(
-            instance.ingredients.all(), many=True).data
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['ingredients'] = MiniRecipesSerializer(
+    #         instance.ingredients.all(), many=True).data
+    #     return representation
     # def to_representation(self, instance):
     #     representation = super().to_representation(instance)
     #     return MiniRecipesSerializer(instance, many=True).data
