@@ -18,31 +18,46 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
-    author = filters.ModelChoiceFilter(
-        queryset=User.objects.all(),
-    )
+    # author = filters.ModelChoiceFilter(
+    #     queryset=User.objects.all(),
+    # )
 
     class Meta:
         model = Recipe
-        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
+        # fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
+        fields = ('tags', 'author')
+
+    # def get_is_favorited(self, queryset, name, value):
+    #     logger.info('queryset_favorite', queryset)
+    #     logger.info('value', value)
+    #     if self.request.user.is_authenticated:
+    #         logger.info('работает!')
+    #         filter_fav_result = queryset.filter(
+    #             favorites__user=self.request.user)
+    #         logger.info(f'filter_fav_result, {filter_fav_result}')
+    #         return filter_fav_result
+    #     return queryset
+
+    # def get_is_in_shopping_cart(self, queryset, name, value):
+    #     logger.info('queryset_shopcart', queryset)
+    #     if self.request.user.is_authenticated:
+    #         filter_sc_result = queryset.filter(shopping_cart__user=self.request.user)
+    #         logger.info(f'filter_sc_result, {filter_sc_result}')
+    #         return filter_sc_result
+    #     return queryset
 
     def get_is_favorited(self, queryset, name, value):
-        logger.info('queryset_favorite', queryset)
-        logger.info('value', value)
-        if self.request.user.is_authenticated:
-            logger.info('работает!')
-            filter_fav_result = queryset.filter(
-                favorites__user=self.request.user)
-            logger.info(f'filter_fav_result, {filter_fav_result}')
-            return filter_fav_result
+        logger.info('value_fav', value)
+        user = self.request.user
+        if value and not user.is_anonymous:
+            return queryset.filter(favorites__user=user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        logger.info('queryset_shopcart', queryset)
-        if self.request.user.is_authenticated:
-            filter_sc_result = queryset.filter(shopping_cart__user=self.request.user)
-            logger.info(f'filter_sc_result, {filter_sc_result}')
-            return filter_sc_result
+        logger.info('value_sc', value)
+        user = self.request.user
+        if value and not user.is_anonymous:
+            return queryset.filter(shopping_cart__user=user)
         return queryset
 
 
