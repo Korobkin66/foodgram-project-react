@@ -53,7 +53,7 @@ class RecipeFilter(FilterSet):
         logger.info('queryset_fav', queryset)
         logger.info('value_fav', value)
         if self.request.user.is_authenticated and value == 1:
-            return queryset.filter(favorite__user=self.request.user)
+            return queryset.filter(favorites__user=self.request.user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
