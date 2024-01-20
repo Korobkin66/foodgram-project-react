@@ -111,10 +111,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = Quantity.objects.filter(recipe=obj).values(
             'ingredient__id', 'ingredient__name', 'ingredient__measurement_unit', 'amount'
         )
-        logger.info(f'ingredient__id {id}')  #ingredient__id
-        logger.info(f'ingredient__name {ingredient__name}')  #ingredient__name
-        logger.info(f'ingredient__measurement_unit {ingredient__measurement_unit}')  #ingredient__measurement_unit
-        logger.info(f'amount {amount}')  #amount
         logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         return ingredients_data
 
