@@ -28,25 +28,35 @@ class RecipeFilter(FilterSet):
         model = Recipe
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
+    # def get_is_favorited(self, queryset, name, value):
+    #     logger.info('queryset_favorite', queryset)
+    #     logger.info('value', value)
+    #     if self.request.user.is_authenticated:
+    #         logger.info('работает!')
+    #         filter_fav_result = queryset.filter(
+    #             favorites__user=self.request.user)
+    #         logger.info(f'filter_fav_result, {filter_fav_result}')
+    #         return filter_fav_result
+    #     return queryset
+
+    # def get_is_in_shopping_cart(self, queryset, name, value):
+    #     logger.info('queryset_shopcart', queryset)
+    #     if self.request.user.is_authenticated:
+    #         filter_sc_result = queryset.filter(cart__user=self.request.user)
+    #         logger.info(f'cart__user, {cart__user}')
+    #         logger.info(f'cart, {cart}')
+    #         logger.info(f'filter_sc_result, {filter_sc_result}')
+    #         return filter_sc_result
+    #     return queryset
+    
     def get_is_favorited(self, queryset, name, value):
-        logger.info('queryset_favorite', queryset)
-        logger.info('value', value)
-        if self.request.user.is_authenticated:
-            logger.info('работает!')
-            filter_fav_result = queryset.filter(
-                favorites__user=self.request.user)
-            logger.info(f'filter_fav_result, {filter_fav_result}')
-            return filter_fav_result
+        if self.request.user.is_authenticated and value:
+            return queryset.filter(favorite__user=self.request.user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        logger.info('queryset_shopcart', queryset)
-        if self.request.user.is_authenticated:
-            filter_sc_result = queryset.filter(cart__user=self.request.user)
-            logger.info(f'cart__user, {cart__user}')
-            logger.info(f'cart, {cart}')
-            logger.info(f'filter_sc_result, {filter_sc_result}')
-            return filter_sc_result
+        if self.request.user.is_authenticated and value:
+            return queryset.filter(cart__user=self.request.user)
         return queryset
 
 
