@@ -101,11 +101,16 @@ class MaxiIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = BaseUserSerializer(read_only=True)
-    ingredients = MaxiIngredientSerializer(read_only=True, many=True,
-                                           source='quantity_set')
+    ingredients = SerializerMethodField()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image =  Base64ImageField()
+
+    def get_ingredients(self, obj) :
+        ingredients = obj.ingredients.values(
+            "id", "name", "measurement_unit", amount=F("recipe__amount")
+        )
+        return ingredients
 
     def validate(self, data):
         validated_data = super().validate(data)
