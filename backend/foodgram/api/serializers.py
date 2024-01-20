@@ -1,4 +1,3 @@
-import logging
 from drf_extra_fields.fields import Base64ImageField
 from django.db import transaction
 from django.db.models import F
@@ -12,8 +11,6 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
-
-logger = logging.getLogger(__name__)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -111,7 +108,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = obj.ingredients.values(
             "id", "name", "measurement_unit", amount=F("quan_ingr__amount")
         )
-        logger.info(f'ingredients {ingredients}')  # ingredients
         return ingredients
 
     def validate(self, data):
@@ -119,7 +115,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = validated_data.get('recipes', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
-        logger.info(f'ingredients_val {ingredients}')  #ingredients_val
         ingredient_names = set()
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
@@ -133,7 +128,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 "ingredients": ingredients
             }
         )
-        logger.info(f'validated_data_val {validated_data}')  # validated_data_val
         return validated_data
 
     class Meta:
@@ -164,35 +158,26 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = []
             for ingredient_data in ingredients_data:
                 ingredient_id = ingredient_data.get('id')
-                logger.info(f'ingredient_data_ID {ingredients_data}')  # ingredient_data_ID
                 amount = ingredient_data.get('amount')
                 ingredient = Ingredient.objects.get(id=ingredient_id)
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
-            logger.info(f'ingredients_data {ingredients_data}')  # ingredients_data
             Quantity.objects.bulk_create(ingredients)
 
     @transaction.atomic
     def create(self, validated_data):
-        logger.info(f'validated_data {validated_data}')  #validated_data
         tags_data = validated_data.pop('tags', [])
-        logger.info(f'tags_data {tags_data}')  #tags_data
         ingredients_data = validated_data.pop('ingredients', [])
         validated_data['author'] = self.context['request'].user
-        logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         recipe = Recipe.objects.create(**validated_data)
-        logger.info(f'recipe_update {recipe}')  #recipe
         self.process_tags_and_ings(recipe, tags_data, ingredients_data)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        logger.info(f'instance_update {instance}')  #instance_update
-        logger.info(f'validated_data_update {validated_data}')  #validated_data_update
         tags_data = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('ingredients', [])
-        logger.info(f'ingredients_data_udate {ingredients_data}')  #ingredients_data_udate
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
         super().update(instance, validated_data)
         logger.info(f'instance_update {instance}')
