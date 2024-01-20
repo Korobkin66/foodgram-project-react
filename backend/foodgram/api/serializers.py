@@ -161,12 +161,24 @@ class RecipeSerializer(serializers.ModelSerializer):
             tags = [Tag.objects.get(id=tag_id) for tag_id in tags_data]
             instance.tags.set(tags)
 
+            # ingredients = []
+            # for ingredient_data in ingredients_data:
+            #     # ingredient_id = ingredient_data.get('id')
+            #     ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
+            #     amount = ingredient_data.get('amount')
+            #     ingredient = Quantity.objects.get(ingredient__id=ingredient_id)
+            #     ingredients.append(Quantity(recipe=instance,
+            #                                 ingredient=ingredient,
+            #                                 amount=amount))
+            # logger.info(f'ingredients_data {ingredients_data}')
+            # Quantity.objects.bulk_create(ingredients)
+
             ingredients = []
             for ingredient_data in ingredients_data:
                 # ingredient_id = ingredient_data.get('id')
                 ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
                 amount = ingredient_data.get('amount')
-                ingredient = Quantity.objects.get(ingredient__id=ingredient_id)
+                ingredient = Ingredient.objects.get(id=ingredient_id)
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
