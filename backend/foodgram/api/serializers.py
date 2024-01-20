@@ -108,7 +108,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     image =  Base64ImageField()
 
     def get_ingredients(self, obj) :
-        ingredients = obj.quan_ingr.values(
+        ingredients = obj.ingredients.values(
             "id", "name", "measurement_unit", amount=F("recipe__amount")
         )
         logger.info(f'ingredients {ingredients}')  #ingredients
