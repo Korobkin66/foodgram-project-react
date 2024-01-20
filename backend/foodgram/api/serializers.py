@@ -108,11 +108,11 @@ class RecipeSerializer(serializers.ModelSerializer):
     image =  Base64ImageField()
 
     def get_ingredients(self, obj) :
-        ingredients_data = Quantity.objects.filter(recipe=obj).values(
-            'ingredient__id', 'ingredient__name', 'ingredient__measurement_unit', 'amount'
+        ingredients = obj.quan_ingr.values(
+            "id", "name", "measurement_unit", amount=F("recipe__amount")
         )
-        logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
-        return ingredients_data
+        logger.info(f'ingredients {ingredients}')  #ingredients
+        return ingredients
 
     def validate(self, data):
         validated_data = super().validate(data)
@@ -161,29 +161,29 @@ class RecipeSerializer(serializers.ModelSerializer):
             tags = [Tag.objects.get(id=tag_id) for tag_id in tags_data]
             instance.tags.set(tags)
 
-            ingredients = []
-            for ingredient_data in ingredients_data:
-                # ingredient_id = ingredient_data.get('id')
-                ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
-                amount = ingredient_data.get('amount')
-                ingredient = Ingredient.objects.get(ingredient__id=ingredient_id)
-                ingredients.append(Quantity(recipe=instance,
-                                            ingredient=ingredient,
-                                            amount=amount))
-            logger.info(f'ingredients_data {ingredients_data}')
-            Quantity.objects.bulk_create(ingredients)
-
             # ingredients = []
             # for ingredient_data in ingredients_data:
             #     # ingredient_id = ingredient_data.get('id')
             #     ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
             #     amount = ingredient_data.get('amount')
-            #     ingredient = Ingredient.objects.get(id=ingredient_id)
+            #     ingredient = Ingredient.objects.get(ingredient__id=ingredient_id)
             #     ingredients.append(Quantity(recipe=instance,
             #                                 ingredient=ingredient,
             #                                 amount=amount))
             # logger.info(f'ingredients_data {ingredients_data}')
             # Quantity.objects.bulk_create(ingredients)
+
+            ingredients = []
+            for ingredient_data in ingredients_data:
+                # ingredient_id = ingredient_data.get('id')
+                ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
+                amount = ingredient_data.get('amount')
+                ingredient = Ingredient.objects.get(id=ingredient_id)
+                ingredients.append(Quantity(recipe=instance,
+                                            ingredient=ingredient,
+                                            amount=amount))
+            logger.info(f'ingredients_data {ingredients_data}')
+            Quantity.objects.bulk_create(ingredients)
 
     @transaction.atomic
     def create(self, validated_data):
