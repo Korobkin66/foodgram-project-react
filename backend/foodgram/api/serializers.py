@@ -180,7 +180,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients', [])
         self.process_tags_and_ings(instance, tags_data, ingredients_data)
         super().update(instance, validated_data)
-        logger.info(f'instance_update {instance}')
         return instance
 
 
