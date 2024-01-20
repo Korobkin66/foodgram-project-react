@@ -104,7 +104,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField()
 
-    def get_ingredients(self, obj) :
+    def get_ingredients(self, obj):
         ingredients = obj.ingredients.values(
             "id", "name", "measurement_unit", amount=F("quan_ingr__amount")
         )
