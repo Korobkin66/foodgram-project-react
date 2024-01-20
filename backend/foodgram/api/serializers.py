@@ -59,8 +59,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
             User.USERNAME_FIELD,
-            'password',
-        )
+            'password')
 
 
 class FollowSerializer(BaseUserSerializer):
@@ -104,7 +103,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField()
 
-    def get_ingredients(self, obj) :
+    def get_ingredients(self, obj):
         ingredients = obj.ingredients.values(
             "id", "name", "measurement_unit", amount=F("quan_ingr__amount")
         )
@@ -207,7 +206,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.get(id=recipe_id)
         favorite = Favorite.objects.get(user=user, recipe=recipe)
         favorite.delete()
-    
+
     class Meta:
         fields = '__all__'
         model = Favorite
