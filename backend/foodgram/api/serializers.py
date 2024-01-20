@@ -1,6 +1,7 @@
 import logging
 from drf_extra_fields.fields import Base64ImageField
 from django.db import transaction
+from django.db.models import F
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
@@ -108,7 +109,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_ingredients(self, obj) :
         ingredients = obj.ingredients.values(
-            "id", "name", "measurement_unit", amount=("recipe__amount")
+            "id", "name", "measurement_unit", amount=F("recipe__amount")
         )
         return ingredients
 
