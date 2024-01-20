@@ -43,6 +43,8 @@ class RecipeFilter(FilterSet):
         logger.info('queryset_shopcart', queryset)
         if self.request.user.is_authenticated:
             filter_sc_result = queryset.filter(cart__user=self.request.user)
+            logger.info(f'cart__user, {cart__user}')
+            logger.info(f'cart, {cart}')
             logger.info(f'filter_sc_result, {filter_sc_result}')
             return filter_sc_result
         return queryset
