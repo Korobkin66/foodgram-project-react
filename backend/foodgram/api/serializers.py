@@ -59,8 +59,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
             User.USERNAME_FIELD,
-            'password',
-        )
+            'password')
 
 
 class FollowSerializer(BaseUserSerializer):
@@ -207,7 +206,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.get(id=recipe_id)
         favorite = Favorite.objects.get(user=user, recipe=recipe)
         favorite.delete()
-    
+
     class Meta:
         fields = '__all__'
         model = Favorite
