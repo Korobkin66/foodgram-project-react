@@ -109,7 +109,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_ingredients(self, obj) :
         ingredients_data = Quantity.objects.filter(recipe=obj).values(
-            'id', 'ingredient__name', 'ingredient__measurement_unit', 'amount'
+            'ingredient__id', 'ingredient__name', 'ingredient__measurement_unit', 'amount'
         )
         logger.info(f'ingredients_data {ingredients_data}')  #ingredients_data
         return ingredients_data
@@ -142,15 +142,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
         model = Recipe
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['ingredients'] = MiniRecipesSerializer(
-    #         instance.ingredients.all(), many=True).data
-    #     return representation
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     return MiniRecipesSerializer(instance, many=True).data
-
     def get_is_favorited(self, obj):
         current_user = self.context['request'].user
         if current_user.is_authenticated:
@@ -175,7 +166,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 # ingredient_id = ingredient_data.get('id')
                 ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
                 amount = ingredient_data.get('amount')
-                ingredient = Ingredient.objects.get(id=ingredient_id)
+                ingredient = Ingredient.objects.get(id=ingredient__id)
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
