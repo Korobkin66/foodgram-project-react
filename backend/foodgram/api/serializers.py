@@ -164,9 +164,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = []
             for ingredient_data in ingredients_data:
                 # ingredient_id = ingredient_data.get('id')
-                ingredient_id = ingredient_data.get('ingredient__id', {}).get('id') # attempt
+                ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
                 amount = ingredient_data.get('amount')
-                ingredient = Ingredient.objects.get(ingredient__id=ingredient_id)
+                ingredient = Quantity.objects.get(ingredient__id=ingredient_id)
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
