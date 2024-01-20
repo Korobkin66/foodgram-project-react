@@ -177,12 +177,13 @@ class RecipeSerializer(serializers.ModelSerializer):
             for ingredient_data in ingredients_data:
                 # ingredient_id = ingredient_data.get('id')
                 ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
+                logger.info(f'ingredient_data_ID {ingredients_data}') #ingredient_data_ID
                 amount = ingredient_data.get('amount')
                 ingredient = Ingredient.objects.get(id=ingredient_id)
                 ingredients.append(Quantity(recipe=instance,
                                             ingredient=ingredient,
                                             amount=amount))
-            logger.info(f'ingredients_data {ingredients_data}')
+            logger.info(f'ingredients_data {ingredients_data}') #ingredients_data
             Quantity.objects.bulk_create(ingredients)
 
     @transaction.atomic
