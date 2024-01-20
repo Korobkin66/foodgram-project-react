@@ -108,10 +108,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     image =  Base64ImageField()
 
     def get_ingredients(self, obj) :
-        ingredients = obj.ingredients.values(
-            "id", "name", "measurement_unit", "recipes__amount"
+        ingredients_data = Quantity.objects.filter(recipe=obj).values(
+            'ingredient__id', 'ingredient__name', 'ingredient__measurement_unit', 'amount'
         )
-        return ingredients
+        return ingredients_data
 
     def validate(self, data):
         validated_data = super().validate(data)
