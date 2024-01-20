@@ -176,7 +176,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = []
             for ingredient_data in ingredients_data:
                 # ingredient_id = ingredient_data.get('id')
-                ingredient_id = ingredient_data.get('ingredient', {}).get('id') # attempt
+                ingredient_id = ingredient_data.get('id') # attempt
                 logger.info(f'ingredient_data_ID {ingredients_data}') #ingredient_data_ID
                 amount = ingredient_data.get('amount')
                 ingredient = Ingredient.objects.get(id=ingredient_id)
