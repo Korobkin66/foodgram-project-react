@@ -13,6 +13,7 @@ from users.models import Follow, User
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
+                          FollowSerializer2,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, MiniRecipesSerializer)
