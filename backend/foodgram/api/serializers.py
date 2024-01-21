@@ -65,24 +65,24 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             )
 
 
-# class FollowSerializer(BaseUserSerializer):
-#     recipes = MiniRecipesSerializer(read_only=True, many=True)
-#     recipes_count = SerializerMethodField()
+class FollowSerializer(BaseUserSerializer):
+    recipes = MiniRecipesSerializer(read_only=True, many=True)
+    recipes_count = SerializerMethodField()
 
-#     class Meta(BaseUserSerializer.Meta):
-#         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-#                   'is_subscribed', 'recipes', 'recipes_count')
+    class Meta(BaseUserSerializer.Meta):
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                  'is_subscribed', 'recipes', 'recipes_count')
 
-#     def get_recipes_count(self, obj):
-#         return Recipe.objects.filter(author=obj).count()
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
 
-#     def get_recipes(self, obj):
-#         request = self.context.get('request')
-#         limit = request.GET.get('recipes_limit')
-#         queryset = Recipe.objects.filter(author=obj)
-#         if limit:
-#             queryset = queryset[:int(limit)]
-#         return MiniRecipesSerializer(queryset, many=True).data
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return MiniRecipesSerializer(queryset, many=True).data
 
 #     # def validate(self, obj):
 #     #     author = self.instance
