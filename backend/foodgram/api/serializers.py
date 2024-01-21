@@ -106,10 +106,12 @@ class FollowSerializer2(serializers.ModelSerializer):
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
 
-    def get_is_subscribed(self, obj): -Ю берешь из бейсюзер
-        return Follow.objects.filter(
-            user=obj.user, folowing=obj.author
-        ).exists()
+    def get_is_subscribed(self, obj):
+        current_user = self.context.get('request').user
+        if current_user.is_authenticated:
+            return Follow.objects.filter(user=current_user,
+                                         following=obj.id).exists()
+        return False
 
     def get_recipes(self, obj): # беру старый
         request = self.context.get('request')
