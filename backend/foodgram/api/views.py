@@ -1,4 +1,3 @@
-import logging
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -21,8 +20,6 @@ from .pagination import MyPagination
 from .services import get_shopping_cart
 from .filter import RecipeFilter, IngredientFilter
 
-logger = logging.getLogger(__name__)
-
 
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
@@ -38,8 +35,8 @@ class UserViewSet(UserViewSet):
             user=user, following=follow_author)
         if request.method == 'POST':
             serializer = SubscribeSerializer(data=request.data,
-                                          instance=follow_author,
-                                          context={"request": request})
+                                             instance=follow_author,
+                                             context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
@@ -57,7 +54,7 @@ class UserViewSet(UserViewSet):
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(users)
-        serializer = FollowSerializer(data, many=True,
+        serializer = SubscribeSerializer(data, many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
 
@@ -137,8 +134,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         shopping_cart = get_shopping_cart(request)
-        logger.info(f'shopping_cart {shopping_cart}') #shopping_cart
-        result = "\n".join([f"{key}: {' '.join([f'{k}: {v}' for k, v in value.items()])}" for key, value in shopping_cart.items()])
+        result = "\n".join(
+            [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
+             for key, value in shopping_cart.items()])
         response = HttpResponse(result,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'

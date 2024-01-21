@@ -11,9 +11,6 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -97,7 +94,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
     first_name = serializers.ReadOnlyField(source='following.last_name') 
     last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
+    # recipes = serializers.SerializerMethodField()
+    recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -105,12 +103,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
 
-    def get_is_subscribed(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_authenticated:
-            return Follow.objects.filter(user=current_user,
-                                         following=obj.id).exists()
-        return False
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -120,9 +114,22 @@ class SubscribeSerializer(serializers.ModelSerializer):
             queryset = queryset[:int(limit)]
         return MiniRecipesSerializer(queryset, many=True).data
 
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+    def get_is_subscribed(self, obj):
+        current_user = self.context.get('request').user
+        if current_user.is_authenticated:
+            return Follow.objects.filter(user=current_user,
+                                         following=obj.id).exists()
+        return False
 
+    def validate(self, obj):
+        author = self.instance
+        user = self.context.get('request').user
+        if user == author:
+            raise ValidationError(
+                detail='Вы не можете подписаться на самого себя!',
+                code=HTTP_400_BAD_REQUEST
+            )
+        return obj
 
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
@@ -152,18 +159,12 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         validated_data = super().validate(data)
-        logger.info(f'validated_data {validated_data}') #validated_data
-        # recipe = validated_data.get('ingredients', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
-        logger.info(f'ingredients {ingredients}') #ingredients
         ingredient_names = set()
         for ingredient_data in ingredients:
-            logger.info(f'ingredient_data {ingredient_data}') # ingredient_data log
-            # ingredient_name = ingredient_data['ingredient']['name']
             ingredient_name = ingredient_data['id']
             if ingredient_name in ingredient_names:
-                logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart log
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
@@ -208,7 +209,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
             ingredients = []
             Quantity.objects.filter(recipe=instance).delete()
-            # recipe = Recipe.objects.get(recipe=instans)
             for ingredient_data in ingredients_data:
                 ingredient_id = ingredient_data.get('id')
                 amount = ingredient_data.get('amount')
