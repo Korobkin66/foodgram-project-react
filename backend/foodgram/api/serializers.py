@@ -163,7 +163,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
 
             ingredients = []
-            Quantity.objects.filter(recipe=instance).clear()
+            Quantity.objects.filter(recipe=instance).delete()
             # recipe = Recipe.objects.get(recipe=instans)
             for ingredient_data in ingredients_data:
                 ingredient_id = ingredient_data.get('id')
