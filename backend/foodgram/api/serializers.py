@@ -121,9 +121,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
             if ingredient_name in ingredient_names:
-                raise serializers.ValidationError(
-                    f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
+                # raise serializers.ValidationError(
+                #     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
+
             ingredient_names.add(ingredient_name)
+            amount = ingredient_data['quan_ingr']['amount']
+            if amount < 0:
+                raise serializers.ValidationError(
+                    f"Количество ингредиента "
+                    f"'{ingredient_name}'не может быть отрицательным.")
         validated_data.update(
             {
                 "tags": tags,
@@ -158,6 +164,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
 
             ingredients = []
+            Quantity.objects.filter(recipe=instance).clear()
+            # recipe = Recipe.objects.get(recipe=instans)
             for ingredient_data in ingredients_data:
                 ingredient_id = ingredient_data.get('id')
                 amount = ingredient_data.get('amount')
