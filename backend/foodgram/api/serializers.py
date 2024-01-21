@@ -116,7 +116,7 @@ class FollowSerializer2(serializers.ModelSerializer):
     def get_recipes(self, obj): # беру старый
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj.author)
+        queryset = Recipe.objects.filter(author=obj)
         if limit:
             queryset = queryset[:int(limit)]
         return CropRecipeSerializer(queryset, many=True).data
@@ -160,10 +160,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         logger.info(f'ingredients {ingredients}') #ingredients
         ingredient_names = set()
         for ingredient_data in ingredients:
+            logger.info(f'ingredient_data {ingredient_data}') # ingredient_data log
             # ingredient_name = ingredient_data['ingredient']['name']
             ingredient_name = ingredient_data['name']
             if ingredient_name in ingredient_names:
-                logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart
+                logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart log
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
