@@ -142,7 +142,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         shopping_cart = get_shopping_cart(request)
         logger.info(f'shopping_cart {shopping_cart}') #shopping_cart
-        response = HttpResponse(shopping_cart,
+        result = "\n".join([f"{key}: {' '.join([f'{k}: {v}' for k, v in value.items()])}" for key, value in shopping_cart.items()])
+        response = HttpResponse(result,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'
         response["Content-Disposition"] = f"attachment; filename={filename}"
