@@ -123,6 +123,17 @@ class FollowSerializer2(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
+    
+    def validate(self, obj):
+        logger.info(f'HE IS HERE!!!!!!!!!!') #shopping_cart
+        author = self.instance
+        user = self.context.get('request').user
+        if user == author:
+            raise ValidationError(
+                detail='Вы не можете подписаться на самого себя!',
+                code=HTTP_400_BAD_REQUEST
+            )
+        return obj
 
 
 
