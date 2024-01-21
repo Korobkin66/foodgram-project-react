@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -18,6 +19,8 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
 from .pagination import MyPagination, MyPaginationForSubs
 from .services import get_shopping_cart
 from .filter import RecipeFilter, IngredientFilter
+
+logger = logging.getLogger(__name__)
 
 
 class UserViewSet(UserViewSet):
@@ -138,7 +141,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         shopping_cart = get_shopping_cart(request)
-        print(shopping_cart)
+        logger.info(f'shopping_cart {shopping_cart}') #shopping_cart
         response = HttpResponse(shopping_cart,
                                 content_type="text.txt; charset=utf-8")
         filename = 'loaded_ingr.txt'
