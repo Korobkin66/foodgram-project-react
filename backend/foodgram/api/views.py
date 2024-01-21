@@ -15,7 +15,7 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer, MiniRecipesSerializer)
-from .pagination import MyPagination
+from .pagination import MyPagination, MyPaginationForSubs
 from .services import get_shopping_cart
 from .filter import RecipeFilter, IngredientFilter
 
@@ -24,6 +24,11 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = BaseUserSerializer
     pagination_class = MyPagination
+
+    def get_pagination_class(self):
+        if self.action == 'subscriptions':
+            return MyPaginationForSubs
+        return super().get_pagination_class()
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
