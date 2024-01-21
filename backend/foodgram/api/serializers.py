@@ -11,6 +11,9 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -121,6 +124,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
             if ingredient_name in ingredient_names:
+                logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
