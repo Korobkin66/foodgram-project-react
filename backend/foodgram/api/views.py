@@ -41,7 +41,7 @@ class UserViewSet(UserViewSet):
         follow_instance, created = Follow.objects.get_or_create(
             user=user, following=follow_author)
         if request.method == 'POST':
-            serializer = FollowSerializer(data=request.data,
+            serializer = FollowSerializer2(data=request.data,
                                           instance=follow_author,
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)

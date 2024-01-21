@@ -91,6 +91,39 @@ class FollowSerializer(BaseUserSerializer):
         return obj
 
 
+class FollowSerializer2(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='following.id') 
+    email = serializers.ReadOnlyField(source='following.email') 
+    username = serializers.ReadOnlyField(source='following.username') 
+    first_name = serializers.ReadOnlyField(source='following.last_name') 
+    last_name = serializers.ReadOnlyField(source='following.last_name') 
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Follow
+        fields = ('id', 'email', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_is_subscribed(self, obj): -Ю берешь из бейсюзер
+        return Follow.objects.filter(
+            user=obj.user, folowing=obj.author
+        ).exists()
+
+    def get_recipes(self, obj): # беру старый
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return CropRecipeSerializer(queryset, many=True).data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
+
+
+
 class MaxiIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -124,7 +157,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get("ingredients")
         logger.info(f'ingredients {ingredients}') #ingredients
         ingredient_names = set()
-        for ingredient_data in recipe:
+        for ingredient_data in ingredients:
             # ingredient_name = ingredient_data['ingredient']['name']
             ingredient_name = ingredient_data['name']
             if ingredient_name in ingredient_names:
