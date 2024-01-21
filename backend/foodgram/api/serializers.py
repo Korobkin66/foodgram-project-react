@@ -171,7 +171,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             if int(amount) < 0:
                 raise serializers.ValidationError(
                     f"Количество ингредиента "
-                    f"'{ingredient_name}'не может быть отрицательным.")
+                    f"'{ingredient_name}'не может быть отрицательным.",
+                    code=HTTP_400_BAD_REQUEST)
         validated_data.update(
             {
                 "tags": tags,
