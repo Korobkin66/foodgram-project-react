@@ -119,12 +119,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         logger.info(f'validated_data {validated_data}') #validated_data
-        recipe = validated_data.get('ingredients', [])
+        # recipe = validated_data.get('ingredients', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
+        logger.info(f'ingredients {ingredients}') #ingredients
         ingredient_names = set()
         for ingredient_data in recipe:
-            ingredient_name = ingredient_data['ingredient']['name']
+            # ingredient_name = ingredient_data['ingredient']['name']
+            ingredient_name = ingredient_data['name']
             if ingredient_name in ingredient_names:
                 logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart
                 raise serializers.ValidationError(
