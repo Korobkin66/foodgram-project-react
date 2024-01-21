@@ -125,7 +125,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
             amount = ingredient_data['quan_ingr']['amount']
-            if amount < 0:
+            if int(amount) < 0:
                 raise serializers.ValidationError(
                     f"Количество ингредиента "
                     f"'{ingredient_name}'не может быть отрицательным.")
