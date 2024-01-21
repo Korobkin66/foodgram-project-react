@@ -29,11 +29,6 @@ class UserViewSet(UserViewSet):
     serializer_class = BaseUserSerializer
     pagination_class = MyPagination
 
-    # def get_pagination_class(self):
-    #     if self.action == 'subscriptions':
-    #         return MyPaginationForSubs
-    #     return super().get_pagination_class()
-
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, request, id):
@@ -62,7 +57,7 @@ class UserViewSet(UserViewSet):
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(users)
-        serializer = FollowSerializer(data, many=True,
+        serializer = FollowSerializer2(data, many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
 

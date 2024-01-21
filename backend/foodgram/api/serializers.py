@@ -168,7 +168,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
-            amount = ingredient_data['quan_ingr']['amount']
+            amount = ingredient_data['amount']
             if int(amount) < 0:
                 raise serializers.ValidationError(
                     f"Количество ингредиента "
