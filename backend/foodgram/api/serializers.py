@@ -80,7 +80,6 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def validate(self, obj):
-        logger.info(f'HE IS HERE!!!!!!!!!!') #shopping_cart
         author = self.instance
         user = self.context.get('request').user
         if user == author:
@@ -91,7 +90,7 @@ class FollowSerializer(BaseUserSerializer):
         return obj
 
 
-class FollowSerializer2(serializers.ModelSerializer):
+class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id') 
     email = serializers.ReadOnlyField(source='following.email') 
     username = serializers.ReadOnlyField(source='following.username') 
@@ -113,7 +112,7 @@ class FollowSerializer2(serializers.ModelSerializer):
                                          following=obj.id).exists()
         return False
 
-    def get_recipes(self, obj): # беру старый
+    def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj)
@@ -123,17 +122,6 @@ class FollowSerializer2(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
-    
-    def validate(self, obj):
-        logger.info(f'HE IS HERE!!!!!!!!!!') #shopping_cart
-        author = self.instance
-        user = self.context.get('request').user
-        if user == author:
-            raise ValidationError(
-                detail='Вы не можете подписаться на самого себя!',
-                code=HTTP_400_BAD_REQUEST
-            )
-        return obj
 
 
 
