@@ -72,8 +72,7 @@ class FollowSerializer(BaseUserSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
-    # class Meta(BaseUserSerializer.Meta):
-    class Meta:
+    class Meta(BaseUserSerializer.Meta):
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'is_subscribed', 'recipes', 'recipes_count')
 
@@ -120,7 +119,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         logger.info(f'validated_data {validated_data}') #validated_data
-        recipe = validated_data.get('recipes', [])
+        recipe = validated_data.get('ingredients', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
         ingredient_names = set()
