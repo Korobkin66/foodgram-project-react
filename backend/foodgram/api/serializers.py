@@ -80,6 +80,7 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def validate(self, obj):
+        logger.info(f'HE IS HERE!!!!!!!!!!') #shopping_cart
         author = self.instance
         user = self.context.get('request').user
         if user == author:
