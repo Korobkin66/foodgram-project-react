@@ -119,7 +119,7 @@ class FollowSerializer2(serializers.ModelSerializer):
         queryset = Recipe.objects.filter(author=obj)
         if limit:
             queryset = queryset[:int(limit)]
-        return CropRecipeSerializer(queryset, many=True).data
+        return MiniRecipesSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
