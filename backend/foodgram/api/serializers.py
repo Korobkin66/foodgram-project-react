@@ -121,9 +121,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in recipe:
             ingredient_name = ingredient_data['ingredient']['name']
             if ingredient_name in ingredient_names:
-                # raise serializers.ValidationError(
-                #     f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
-
+                raise serializers.ValidationError(
+                    f"Ингредиент '{ingredient_name}' уже добавлен в рецепт.")
             ingredient_names.add(ingredient_name)
             amount = ingredient_data['quan_ingr']['amount']
             if amount < 0:
