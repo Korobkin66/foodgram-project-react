@@ -72,7 +72,8 @@ class FollowSerializer(BaseUserSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
-    class Meta(BaseUserSerializer.Meta):
+    # class Meta(BaseUserSerializer.Meta):
+    class Meta:
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'is_subscribed', 'recipes', 'recipes_count')
 
