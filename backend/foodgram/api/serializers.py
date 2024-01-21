@@ -118,6 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         validated_data = super().validate(data)
+        logger.info(f'validated_data {validated_data}') #validated_data
         recipe = validated_data.get('recipes', [])
         tags = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
