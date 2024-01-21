@@ -162,7 +162,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in ingredients:
             logger.info(f'ingredient_data {ingredient_data}') # ingredient_data log
             # ingredient_name = ingredient_data['ingredient']['name']
-            ingredient_name = ingredient_data['name']
+            ingredient_name = ingredient_data['id']
             if ingredient_name in ingredient_names:
                 logger.info(f'FFFFFFFFFFFFFAAAAAAAAAAAAAAA') #shopping_cart log
                 raise serializers.ValidationError(
