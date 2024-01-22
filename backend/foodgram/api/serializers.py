@@ -79,6 +79,14 @@ class FollowSerializer(BaseUserSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
 
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return MiniRecipesSerializer(queryset, many=True).data
+
 
 class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id') 
