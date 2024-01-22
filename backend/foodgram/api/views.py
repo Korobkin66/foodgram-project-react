@@ -1,6 +1,6 @@
-from datetime import datetime # test
+from datetime import datetime
 from django.http import HttpResponse
-from django.utils.text import slugify # test
+from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -132,26 +132,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({"log": "Рецепт успешно удален"}, status=HTTP_200_OK)
 
-    # @action(detail=False, methods=['get'],
-    #         permission_classes=[permissions.IsAuthenticated])
-    # def download_shopping_cart(self, request):
-    #     shopping_cart = get_shopping_cart(request)
-    #     result = "\n".join(
-    #         [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
-    #          for key, value in shopping_cart.items()])
-    #     response = HttpResponse(result,
-    #                             content_type="text.txt; charset=utf-8")
-    #     filename = 'loaded_ingr.txt'
-    #     response["Content-Disposition"] = f"attachment; filename={filename}"
-    #     return response
-
     @action(detail=False,
             methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         txt_content = get_shopping_cart(self, request)
         if txt_content is None:
-            return Response('Корзина пуста.', status=status.HTTP_200_OK)
+            return Response('Корзина пуста.', status=HTTP_200_OK)
         date = datetime.now().strftime('%Y%m%d_%H%M%S')
         txt_filename = (f'shopping_cart_'
                         f'{slugify(request.user.username)}_{date}.txt')

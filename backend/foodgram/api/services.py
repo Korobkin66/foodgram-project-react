@@ -1,31 +1,7 @@
-# from django.db.models import Sum
-# from django.db.models.functions import Coalesce
-# from recipes.models import Quantity
+from django.db.models import Sum
 
+from recipes.models import Quantity, ShoppingCart
 
-# def get_shopping_cart(request):
-#     json = {}
-#     user = request.user
-#     quantities = (
-#         Quantity.objects
-#         .filter(recipe__author=user)
-#         .values('ingredient__name', 'ingredient__measurement_unit')
-#         .annotate(quantity=Coalesce(Sum('amount'), 0))
-#     )
-#     for quantity in quantities:
-#         json[quantity['ingredient__name']] = {
-#             'Количество': quantity['quantity'],
-#             'Ед.изм.': quantity['ingredient__measurement_unit']
-#         }
-#     return json
-
-from django.contrib.auth import get_user_model
-from django.db.models import Sum, F
-
-from recipes.models import (Quantity, ShoppingCart,
-                            Recipe,)
-
-# User = get_user_model()
 
 def get_shopping_cart(self, request):
     shopping_cart = ShoppingCart.objects.filter(user=request.user)
