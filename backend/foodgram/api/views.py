@@ -1,6 +1,4 @@
-from datetime import datetime
 from django.http import HttpResponse
-from django.utils.text import slugify  # test
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -56,7 +54,6 @@ class UserViewSet(UserViewSet):
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(users)
-        # data = self.paginate_queryset(queryset)
         serializer = FollowSerializer(data, many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -133,31 +130,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({"log": "Рецепт успешно удален"}, status=HTTP_200_OK)
 
-    # @action(detail=False, methods=['get'],
-    #         permission_classes=[permissions.IsAuthenticated])
-    # def download_shopping_cart(self, request):
-    #     shopping_cart = get_shopping_cart(request)
-    #     result = "\n".join(
-    #         [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
-    #          for key, value in shopping_cart.items()])
-    #     response = HttpResponse(result,
-    #                             content_type="text.txt; charset=utf-8")
-    #     filename = 'loaded_ingr.txt'
-    #     response["Content-Disposition"] = f"attachment; filename={filename}"
-    #     return response
-
-    @action(detail=False,
-            methods=['get'],
+    @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        txt_content = get_shopping_cart(self, request)
-        if txt_content is None:
-            return Response('Корзина пуста.', status=status.HTTP_200_OK)
-        date = datetime.now().strftime('%Y%m%d_%H%M%S')
-        txt_filename = (f'shopping_cart_'
-                        f'{slugify(request.user.username)}_{date}.txt')
-        response = HttpResponse(
-            txt_content, content_type='text/plain')
-        response['Content-Disposition'] = (
-            f'attachment; filename="{txt_filename}"')
+        shopping_cart = get_shopping_cart(request)
+        result = "\n".join(
+            [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
+             for key, value in shopping_cart.items()])
+        response = HttpResponse(result,
+                                content_type="text.txt; charset=utf-8")
+        filename = 'loaded_ingr.txt'
+        response["Content-Disposition"] = f"attachment; filename={filename}"
         return response
