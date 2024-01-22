@@ -107,7 +107,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(user=current_user,
-                                         following=obj).exists()
+                                         following=obj.following).exists()
         return False
 
     def get_recipes(self, obj):
