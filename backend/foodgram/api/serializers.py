@@ -12,6 +12,9 @@ from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,11 +102,17 @@ class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id') 
     email = serializers.ReadOnlyField(source='following.email') 
     username = serializers.ReadOnlyField(source='following.username') 
-    first_name = serializers.ReadOnlyField(source='following.last_name') 
+    first_name = serializers.ReadOnlyField(source='following.first_name') 
     last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
+    logger.info('following', following)
+    logger.info('following.id', following.id)
+    logger.info('following.email', following.email)
+    logger.info('following.uersname', following.uersname)
+    logger.info('following.first_name', following.first_name)
+    logger.info('following.last_name', following.last_name)
 
     class Meta:
         model = Follow
