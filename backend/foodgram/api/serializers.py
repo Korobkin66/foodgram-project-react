@@ -12,9 +12,6 @@ from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
 
-import logging
-
-logger = logging.getLogger(__name__)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
