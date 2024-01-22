@@ -79,41 +79,43 @@ class FollowSerializer(BaseUserSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
 
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
-        if limit:
-            queryset = queryset[:int(limit)]
-        return MiniRecipesSerializer(queryset, many=True).data
+    def validate(self, obj):
+        author = self.instance
+        user = self.context.get('request').user
+        if user == author:
+            raise ValidationError(
+                detail='Вы не можете подписаться на самого себя!',
+                code=HTTP_400_BAD_REQUEST
+            )
+        return obj
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id') 
     email = serializers.ReadOnlyField(source='following.email') 
     username = serializers.ReadOnlyField(source='following.username') 
-    first_name = serializers.ReadOnlyField(source='following.first_name') 
+    first_name = serializers.ReadOnlyField(source='following.last_name') 
     last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
+        model = Follow
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
-        model = Follow
 
     def get_is_subscribed(self, obj):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(user=current_user,
-                                         following=obj.following).exists()
+                                         following=obj.id).exists()
         return False
 
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj.author)
+        queryset = Recipe.objects.filter(author=obj)
         if limit:
             queryset = queryset[:int(limit)]
         return MiniRecipesSerializer(queryset, many=True).data
