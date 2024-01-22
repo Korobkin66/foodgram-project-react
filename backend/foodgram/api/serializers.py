@@ -107,13 +107,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    logger.info('id', id)
-    logger.info('email', email)
-    logger.info('username', username)
-    logger.info('first_name', first_name)
-    logger.info('last_name', last_name)
    
-
     class Meta:
         model = Follow
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
