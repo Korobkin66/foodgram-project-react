@@ -107,7 +107,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    logger.info('following', following)
     logger.info('following.id', following.id)
     logger.info('following.email', following.email)
     logger.info('following.uersname', following.uersname)
@@ -123,19 +122,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(user=current_user,
-                                         following=obj.id).exists()
+                                         following=obj.following).exists()
         return False
 
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
+        queryset = Recipe.objects.filter(author=obj.following)
         if limit:
             queryset = queryset[:int(limit)]
         return MiniRecipesSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return Recipe.objects.filter(author=obj.following).count()
 
 
 
