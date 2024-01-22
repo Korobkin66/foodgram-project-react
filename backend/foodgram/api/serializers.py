@@ -97,7 +97,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField()
-   
+
     class Meta:
         model = Follow
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
@@ -107,7 +107,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(user=current_user,
-                                         following=queryset).exists()
+                                         following=obj.queryset).exists()
         return False
 
     def get_recipes(self, obj):
