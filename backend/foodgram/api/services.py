@@ -13,14 +13,8 @@ def get_shopping_cart(request):
         .annotate(quantity=Coalesce(Sum('amount'), 0))
     )
     for quantity in quantities:
-        ingredient_name = quantity['ingredient__name']
-        measurement_unit = quantity['ingredient__measurement_unit']
-        if ingredient_name not in json:
-            json[ingredient_name] = {
-                'Количество': quantity['quantity'],
-                'Ед.изм.': measurement_unit
-            }
-        else:
-            json[ingredient_name]['Количество'] += quantity['quantity']
-
+        json[quantity['ingredient__name']] = {
+            'Количество': quantity['quantity'],
+            'Ед.изм.': quantity['ingredient__measurement_unit']
+        }
     return json
