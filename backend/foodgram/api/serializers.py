@@ -91,11 +91,11 @@ class FollowSerializer(BaseUserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    # id = serializers.ReadOnlyField(source='following.id') 
-    # email = serializers.ReadOnlyField(source='following.email') 
-    # username = serializers.ReadOnlyField(source='following.username') 
-    # first_name = serializers.ReadOnlyField(source='following.last_name') 
-    # last_name = serializers.ReadOnlyField(source='following.last_name') 
+    id = serializers.ReadOnlyField(source='following.id') 
+    email = serializers.ReadOnlyField(source='following.email') 
+    username = serializers.ReadOnlyField(source='following.username') 
+    first_name = serializers.ReadOnlyField(source='following.last_name') 
+    last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
     # recipes = serializers.SerializerMethodField()
     recipes = MiniRecipesSerializer(read_only=True, many=True)
