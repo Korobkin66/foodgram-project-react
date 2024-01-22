@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.utils.text import slugify  # test
 from django.shortcuts import get_object_or_404
