@@ -55,7 +55,7 @@ class UserViewSet(UserViewSet):
         users = User.objects.filter(id__in=followed_users)
         # data = self.paginate_queryset(users)
         data = self.paginate_queryset(queryset)
-        serializer = FollowSerializer(data, many=True,
+        serializer = SubscribeSerializer(data, many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
 
