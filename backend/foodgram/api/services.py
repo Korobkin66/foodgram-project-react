@@ -20,7 +20,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 
-from recipes.models import RecipeIngredient
+from recipes.models import Quantity
 
 User = get_user_model()
 
@@ -28,7 +28,7 @@ User = get_user_model()
 def get_shopping_cart(self, request):
     """ Функция для скачивания списка покупок. """
 
-    ingredients_data = RecipeIngredient.objects.values(
+    ingredients_data = Quantity.objects.values(
         'ingredient__name', 'ingredient__measurement_unit'
     ).annotate(total_ingredients=Sum('amount')).order_by('ingredient__name')
 
