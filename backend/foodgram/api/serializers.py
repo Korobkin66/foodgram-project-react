@@ -79,16 +79,6 @@ class FollowSerializer(BaseUserSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
 
-    # def validate(self, obj):
-    #     author = self.instance
-    #     user = self.context.get('request').user
-    #     if user == author:
-    #         raise ValidationError(
-    #             detail='Вы не можете подписаться на самого себя!',
-    #             code=HTTP_400_BAD_REQUEST
-    #         )
-    #     return obj
-
 
 class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id') 
@@ -97,8 +87,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
     first_name = serializers.ReadOnlyField(source='following.last_name') 
     last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
-    # recipes = serializers.SerializerMethodField()
-    recipes = MiniRecipesSerializer(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField()
+    # recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
