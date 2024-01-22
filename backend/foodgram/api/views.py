@@ -130,15 +130,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({"log": "Рецепт успешно удален"}, status=HTTP_200_OK)
 
-    @action(detail=False, methods=['get'],
+    # @action(detail=False, methods=['get'],
+    #         permission_classes=[permissions.IsAuthenticated])
+    # def download_shopping_cart(self, request):
+    #     shopping_cart = get_shopping_cart(request)
+    #     result = "\n".join(
+    #         [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
+    #          for key, value in shopping_cart.items()])
+    #     response = HttpResponse(result,
+    #                             content_type="text.txt; charset=utf-8")
+    #     filename = 'loaded_ingr.txt'
+    #     response["Content-Disposition"] = f"attachment; filename={filename}"
+    #     return response
+
+    @action(methods=['get'], detail=False,
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        shopping_cart = get_shopping_cart(request)
-        result = "\n".join(
-            [f"{key}:{' '.join([f'{k}: {v}' for k, v in value.items()])}"
-             for key, value in shopping_cart.items()])
-        response = HttpResponse(result,
-                                content_type="text.txt; charset=utf-8")
-        filename = 'loaded_ingr.txt'
-        response["Content-Disposition"] = f"attachment; filename={filename}"
+        cart_text = generate_shopping_cart_text(request.user)
+        response = HttpResponse(
+            cart_text,
+            content_type='text/plain')
+        response['Content-Disposition'] = (
+            "attachment;filename='shopping_cart.txt'")
         return response
