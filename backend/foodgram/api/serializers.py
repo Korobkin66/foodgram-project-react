@@ -79,21 +79,13 @@ class FollowSerializer(BaseUserSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
 
-    # def get_recipes(self, obj):
-    #     request = self.context.get('request')
-    #     limit = request.GET.get('recipes_limit')
-    #     queryset = Recipe.objects.filter(author=obj)
-    #     if limit:
-    #         queryset = queryset[:int(limit)]
-    #     return MiniRecipesSerializer(queryset, many=True).data
-
     def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj)
-        if recipes_limit := self.context['request'].GET.get(
-                'recipes_limit'):
-            queryset = queryset[:int(recipes_limit)]
-        return MiniRecipesSerializer(queryset,
-                                     many=True).data
+        if limit:
+            queryset = queryset[:int(limit)]
+        return MiniRecipesSerializer(queryset, many=True).data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -103,19 +95,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
     first_name = serializers.ReadOnlyField(source='following.first_name') 
     last_name = serializers.ReadOnlyField(source='following.last_name') 
     is_subscribed = serializers.SerializerMethodField()
-    recipes = MiniRecipesSerializer(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Follow
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
+        model = Follow
 
     def get_is_subscribed(self, obj):
         current_user = self.context.get('request').user
         if current_user.is_authenticated:
             return Follow.objects.filter(user=current_user,
-                                         following=obj.queryset).exists()
+                                         following=obj.id).exists()
         return False
 
     def get_recipes(self, obj):
