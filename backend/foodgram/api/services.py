@@ -19,27 +19,27 @@
 #         }
 #     return json
 
-from io import StringIO
+from django.contrib.auth import get_user_model
+from django.db.models import Sum, F
 
-from django.db.models import Sum
+from recipes.models import (Quantity, ShoppingCart,
+                            Recipe,)
 
-from recipes.models import Quantity
+# User = get_user_model()
 
+def get_shopping_cart(self, request):
+    shopping_cart = ShoppingCart.objects.filter(user=request.user)
+    ingredients_data = Quantity.objects.filter(
+        recipe__cart__in=shopping_cart).values(
+        'ingredient__name', 'ingredient__measurement_unit'
+    ).annotate(total_ingredients=Sum('amount')).order_by('ingredient__name')
 
-def get_shopping_cart(user):
-    text_stream = StringIO()
-    text_stream.write('Список покупок\n')
-    text_stream.write('Ингредиент - Единица измерения - Количество\n')
-    shopping_cart = (
-        Quantity.objects.select_related('recipe', 'ingredient')
-        .filter(recipe__recipes_shoppingcart_related__user=user)
-        .values_list(
-            'ingredient__name',
-            'ingredient__measurement_unit')
-        .annotate(amount=Sum('amount'))
-        .order_by('ingredient__name')
-    )
-    lines = (' - '.join(str(field) for field in item) + '\n'
-             for item in shopping_cart)
-    text_stream.writelines(lines)
-    return text_stream.getvalue()
+    txt_content = 'Список ингредиентов для покупки:\n\n'
+    for item in ingredients_data:
+        ingredient_name = item.get('ingredient__name')
+        measurement_unit = item.get('ingredient__measurement_unit')
+        tolal_amount = item.get('total_ingredients')
+        txt_content += (f'{ingredient_name.capitalize()} -- {tolal_amount}'
+                        f' {measurement_unit}.\n')
+
+    return txt_content

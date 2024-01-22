@@ -1,4 +1,6 @@
+from datetime import datetime # test
 from django.http import HttpResponse
+from django.utils.text import slugify # test
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -143,13 +145,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     #     response["Content-Disposition"] = f"attachment; filename={filename}"
     #     return response
 
-    @action(methods=['get'], detail=False,
+    @action(detail=False,
+            methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        cart_text = generate_shopping_cart_text(request.user)
+        txt_content = get_shopping_cart(self, request)
+        if txt_content is None:
+            return Response('Корзина пуста.', status=status.HTTP_200_OK)
+        date = datetime.now().strftime('%Y%m%d_%H%M%S')
+        txt_filename = (f'shopping_cart_'
+                        f'{slugify(request.user.username)}_{date}.txt')
         response = HttpResponse(
-            cart_text,
-            content_type='text/plain')
+            txt_content, content_type='text/plain')
         response['Content-Disposition'] = (
-            "attachment;filename='shopping_cart.txt'")
+            f'attachment; filename="{txt_filename}"')
         return response
