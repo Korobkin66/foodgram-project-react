@@ -4,7 +4,6 @@ from django.db.models import F
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer as UserHandleSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
@@ -61,8 +60,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             User.USERNAME_FIELD,
             'password',
             'first_name',
-            'last_name'
-            )
+            'last_name')
 
 
 class FollowSerializer(BaseUserSerializer):
@@ -86,11 +84,11 @@ class FollowSerializer(BaseUserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='following.id') 
-    email = serializers.ReadOnlyField(source='following.email') 
-    username = serializers.ReadOnlyField(source='following.username') 
-    first_name = serializers.ReadOnlyField(source='following.last_name') 
-    last_name = serializers.ReadOnlyField(source='following.last_name') 
+    id = serializers.ReadOnlyField(source='following.id')
+    email = serializers.ReadOnlyField(source='following.email')
+    username = serializers.ReadOnlyField(source='following.username')
+    first_name = serializers.ReadOnlyField(source='following.last_name')
+    last_name = serializers.ReadOnlyField(source='following.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
@@ -117,7 +115,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
-
 
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
