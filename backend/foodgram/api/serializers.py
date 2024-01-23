@@ -69,28 +69,21 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             'last_name')
 
 
-class FollowSerializer(BaseUserSerializer):
+class FollowSerializer(serializers.ModelSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
-    recipes_count = SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
-    # class Meta(BaseUserSerializer.Meta):
-    #     fields = ('id', 'username', 'first_name', 'last_name', 'email',
-    #               'is_subscribed', 'recipes', 'recipes_count')
     class Meta:
         model = Follow
         fields = ('id', 'user', 'following', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return Recipe.objects.filter(author=obj.following).count()
 
     def get_recipes(self, obj):
-        logger.info(f'I am running!') # running logs
         request = self.context.get('request')
-        logger.info(f'request {request}') # request logs
         limit = request.GET.get('recipes_limit', 3)
-        logger.info(f'limit {limit}') # limit logs
-        queryset = Recipe.objects.filter(author=obj)[:int(limit)]
-        logger.info(f'queryset {queryset}') # queryset logs
+        queryset = Recipe.objects.filter(author=obj.following)[:int(limit)]
         return MiniRecipesSerializer(queryset, many=True).data
 
     def to_representation(self, instance):
@@ -104,14 +97,6 @@ class FollowSerializer(BaseUserSerializer):
 class FollowSubscribeSerializer(FollowSerializer):
     class Meta(FollowSerializer.Meta):
         fields = FollowSerializer.Meta.fields + ('is_subscribed',)
-
-    is_subscribed = serializers.SerializerMethodField()
-
-    def get_is_subscribed(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_authenticated:
-            return Follow.objects.filter(user=current_user,
-                                         following=obj.id).exists()
 
 
 # class SubscribeSerializer(serializers.ModelSerializer):
