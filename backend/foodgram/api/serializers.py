@@ -104,8 +104,14 @@ class FollowSerializer(BaseUserSerializer):
 class FollowSubscribeSerializer(FollowSerializer):
     class Meta(FollowSerializer.Meta):
         fields = FollowSerializer.Meta.fields + ('is_subscribed',)
-        # fields = ('id', 'email', 'username', 'first_name', 'last_name',
-        #           'is_subscribed', 'recipes', 'recipes_count')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['is_subscribed'] = Follow.objects.filter(
+            user=self.context.get('request').user,
+            following=instance['following']['id'] 
+        ).exists()
+        return ret
 
 
 # class SubscribeSerializer(serializers.ModelSerializer):
