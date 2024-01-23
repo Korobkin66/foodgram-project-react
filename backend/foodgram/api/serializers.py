@@ -90,20 +90,21 @@ class FollowSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['is_subscribed'] = Follow.objects.filter(
             user=self.context.get('request').user,
-            following=instance.following.id
+            following=instance.following
         ).exists()
         return ret
 
 class FollowSubscribeSerializer(FollowSerializer):
     is_subscribed = serializers.SerializerMethodField()
+    
     class Meta(FollowSerializer.Meta):
         fields = FollowSerializer.Meta.fields + ('is_subscribed',)
+    
     def get_is_subscribed(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_authenticated:
-            return Follow.objects.filter(user=current_user,
-                                         following=obj.id).exists()
-        return False
+    current_user = self.context.get('request').user
+    if current_user.is_authenticated:
+        return Follow.objects.filter(user=current_user, following=obj.following).exists()
+    return False
 
 
 # class FollowSerializer(BaseUserSerializer):
