@@ -11,6 +11,10 @@ from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
 
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,11 +79,15 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
+        logger.info(f'I am running!')
         request = self.context.get('request')
+        logger.info(f'request {request}') # request logs
         limit = request.GET.get('recipes_limit')
+        logger.info(f'limit {limit}') # limit logs
         queryset = Recipe.objects.filter(author=obj)
-        if limit:
-            queryset = queryset[:int(limit)]
+        logger.info(f'queryset {queryset}') # queryset logs
+        limit_value = 3
+        queryset = queryset[:int(limit)] if limit else queryset[:limit_value]
         return MiniRecipesSerializer(queryset, many=True).data
 
 
