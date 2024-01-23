@@ -68,7 +68,7 @@ class UserViewSet(UserViewSet):
         # Добавим отладочное сообщение для сериализированных данных
         print("Serialized data:", response_data)
 
-        # return self.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
 
 class TagViewSet(viewsets.ModelViewSet):
