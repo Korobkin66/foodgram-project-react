@@ -100,9 +100,10 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 
-class FollowSerializer(BaseUserSerializer):
+class FollowSerializer(serializers.ModelSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta(BaseUserSerializer.Meta):
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
@@ -110,6 +111,13 @@ class FollowSerializer(BaseUserSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
+
+    def get_is_subscribed(self, obj):
+        current_user = self.context.get('request').user
+        if current_user.is_authenticated:
+            return Follow.objects.filter(user=current_user,
+                                         following=obj.id).exists()
+        return False
 
     def get_recipes(self, obj):
         request = self.context.get('request')
