@@ -37,7 +37,7 @@ class UserViewSet(UserViewSet):
             user=user, following=follow_author)
         if request.method == 'POST':
             serializer = SubscribeSerializer(data=request.data,
-                                             instance=follow_author,
+                                             instance=follow_instance,
                                              context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
