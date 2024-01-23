@@ -100,7 +100,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowSerializer(BaseUserSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
