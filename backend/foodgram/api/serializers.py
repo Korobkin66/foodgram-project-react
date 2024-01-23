@@ -73,7 +73,9 @@ class FollowSerializer(BaseUserSerializer):
     recipes = MiniRecipesSerializer(read_only=True, many=True)
     recipes_count = SerializerMethodField()
 
-    class Meta(BaseUserSerializer.Meta):
+    # class Meta(BaseUserSerializer.Meta):
+    class Meta:
+        model = Follow
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'is_subscribed', 'recipes', 'recipes_count')
 
@@ -90,41 +92,53 @@ class FollowSerializer(BaseUserSerializer):
         logger.info(f'queryset {queryset}') # queryset logs
         return MiniRecipesSerializer(queryset, many=True).data
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['is_subscribed'] = Follow.objects.filter(
+            user=self.context.get('request').user,
+            following=instance.following.id
+        ).exists()
+        return ret
 
-class SubscribeSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='following.id')
-    email = serializers.ReadOnlyField(source='following.email')
-    username = serializers.ReadOnlyField(source='following.username')
-    first_name = serializers.ReadOnlyField(source='following.last_name')
-    last_name = serializers.ReadOnlyField(source='following.last_name')
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+class FollowSubscribeSerializer(FollowSerializer):
+    class Meta(FollowSerializer.Meta):
+        fields = FollowSerializer.Meta.fields
 
-    class Meta:
-        model = Follow
-        fields = ('id', 'email', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
 
-    def get_is_subscribed(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_authenticated:
-            return Follow.objects.filter(user=current_user,
-                                         following=obj.id).exists()
-        return False
+# class SubscribeSerializer(serializers.ModelSerializer):
+#     id = serializers.ReadOnlyField(source='following.id')
+#     email = serializers.ReadOnlyField(source='following.email')
+#     username = serializers.ReadOnlyField(source='following.username')
+#     first_name = serializers.ReadOnlyField(source='following.last_name')
+#     last_name = serializers.ReadOnlyField(source='following.last_name')
+#     is_subscribed = serializers.SerializerMethodField()
+#     recipes = serializers.SerializerMethodField()
+#     recipes_count = serializers.SerializerMethodField()
 
-    def get_recipes(self, obj):
-        logger.info(f'I am running in SubscribeSerializer!') # running logs
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
-        if limit:
-            queryset = queryset[:int(limit)]
-            logger.info(f'queryset_Subscribe {queryset}') # queryset logs
-        return MiniRecipesSerializer(queryset, many=True).data
+#     class Meta:
+#         model = Follow
+#         fields = ('id', 'email', 'username', 'first_name', 'last_name',
+#                   'is_subscribed', 'recipes', 'recipes_count')
 
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+#     def get_is_subscribed(self, obj):
+#         current_user = self.context.get('request').user
+#         if current_user.is_authenticated:
+#             return Follow.objects.filter(user=current_user,
+#                                          following=obj.id).exists()
+#         return False
+
+#     def get_recipes(self, obj):
+#         logger.info(f'I am running in SubscribeSerializer!') # running logs
+#         request = self.context.get('request')
+#         limit = request.GET.get('recipes_limit')
+#         queryset = Recipe.objects.filter(author=obj)
+#         if limit:
+#             queryset = queryset[:int(limit)]
+#             logger.info(f'queryset_Subscribe {queryset}') # queryset logs
+#         return MiniRecipesSerializer(queryset, many=True).data
+
+#     def get_recipes_count(self, obj):
+#         return Recipe.objects.filter(author=obj).count()
 
 
 class MaxiIngredientSerializer(serializers.ModelSerializer):
