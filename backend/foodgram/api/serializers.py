@@ -103,9 +103,9 @@ class FollowSerializer(BaseUserSerializer):
 
 class FollowSubscribeSerializer(FollowSerializer):
     class Meta(FollowSerializer.Meta):
-        # fields = FollowSerializer.Meta.fields + ('is_subscribed',)
-        fields = ('id', 'email', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
+        fields = FollowSerializer.Meta.fields + ('is_subscribed',)
+        # fields = ('id', 'email', 'username', 'first_name', 'last_name',
+        #           'is_subscribed', 'recipes', 'recipes_count')
 
 
 # class SubscribeSerializer(serializers.ModelSerializer):
