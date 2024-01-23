@@ -52,7 +52,7 @@ class UserViewSet(UserViewSet):
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request, id=None):
-        queryset = Follow.objects.filter(user=request.user)
+        queryset = User.objects.filter(user=request.user) # follow to user
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(users)
