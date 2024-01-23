@@ -86,7 +86,7 @@ class FollowSerializer(BaseUserSerializer):
         queryset = Recipe.objects.filter(author=obj)
         # if limit:
         #     queryset = queryset[:int(limit)]
-        return MiniRecipesSerializer(queryset[:3], many=True).data
+        return MiniRecipesSerializer(queryset[:2], many=True).data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
