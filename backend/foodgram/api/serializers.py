@@ -78,7 +78,7 @@ class FollowSerializer(BaseUserSerializer):
     #               'is_subscribed', 'recipes', 'recipes_count')
     class Meta:
         model = Follow
-        fields = ('id', 'user', 'following', 'recipes', 'recipes_count')
+        fields = ('id', 'username', 'following', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
