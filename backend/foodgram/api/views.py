@@ -16,7 +16,7 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
-                          FollowSubscribeSerializer,
+                          SubscribeSerializer,
                           TagSerializer, MiniRecipesSerializer)
 from .pagination import MyPagination
 from .services import get_shopping_cart
@@ -36,7 +36,7 @@ class UserViewSet(UserViewSet):
         follow_instance, created = Follow.objects.get_or_create(
             user=user, following=follow_author)
         if request.method == 'POST':
-            serializer = FollowSubscribeSerializer(data=request.data,
+            serializer = SubscribeSerializer(data=request.data,
                                              instance=follow_author,
                                              context={"request": request})
             serializer.is_valid(raise_exception=True)
@@ -56,7 +56,7 @@ class UserViewSet(UserViewSet):
         followed_users = queryset.values_list('following', flat=True)
         users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(users)
-        serializer = FollowSubscribeSerializer(data, many=True,
+        serializer = FollowSerializer(data, many=True,
                                       context={'request': request})
         return self.get_paginated_response(serializer.data)
 
