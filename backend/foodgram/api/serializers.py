@@ -81,9 +81,13 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
+        logger.info(f'I am running!') # running logs
         request = self.context.get('request')
-        limit = request.GET.get('recipes_limit', 3)  # По умолчанию 3, если не указано
+        logger.info(f'request {request}') # request logs
+        limit = request.GET.get('recipes_limit', 3)
+        logger.info(f'limit {limit}') # limit logs
         queryset = Recipe.objects.filter(author=obj)[:int(limit)]
+        logger.info(f'queryset {queryset}') # queryset logs
         return MiniRecipesSerializer(queryset, many=True).data
 
 
@@ -110,11 +114,13 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return False
 
     def get_recipes(self, obj):
+        logger.info(f'I am running in SubscribeSerializer!') # running logs
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj)
         if limit:
             queryset = queryset[:int(limit)]
+            logger.info(f'queryset_Subscribe {queryset}') # queryset logs
         return MiniRecipesSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
