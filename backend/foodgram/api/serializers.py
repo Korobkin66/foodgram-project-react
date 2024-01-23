@@ -93,14 +93,16 @@ class FollowSerializer(BaseUserSerializer):
             limit_value = int(limit)
 
         logger.info(f"Before limiting: {queryset.count()} recipes") # queryset logs
+        print(f"Before limiting: {queryset.count()} recipes for user {obj.username}")
         queryset = queryset[:limit_value]
         logger.info(f"After limiting: {queryset.count()} recipes") # queryset logs
-        
+        print(f"After limiting: {queryset.count()} recipes for user {obj.username}")
+
         serialized_data = MiniRecipesSerializer(queryset, many=True).data
         logger.info(f"Serialized data: {serialized_data}")
+        print(f"Serialized data: {serialized_data}")
 
         return serialized_data
-        
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
