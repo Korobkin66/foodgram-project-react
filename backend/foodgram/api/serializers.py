@@ -81,29 +81,12 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
-        logger.info(f'I am running!') # running logs
         request = self.context.get('request')
-        logger.info(f'request {request}') # request logs
-        limit = request.GET.get('recipes_limit')
-        logger.info(f'limit {limit}') # limit logs
-        queryset = Recipe.objects.filter(author=obj)
-        logger.info(f'queryset {queryset}') # queryset logs
-        limit_value = 3
-        if limit:
-            limit_value = int(limit)
-
-        logger.info(f"Before limiting: {queryset.count()} recipes") # queryset logs
-        print(f"Before limiting: {queryset.count()} recipes for user {obj.username}")
-        queryset = queryset[:limit_value]
-        logger.info(f"After limiting: {queryset.count()} recipes") # queryset logs
-        print(f"After limiting: {queryset.count()} recipes for user {obj.username}")
-
-        serialized_data = MiniRecipesSerializer(queryset, many=True).data
-        logger.info(f"Serialized data: {serialized_data}")
-        print(f"Serialized data: {serialized_data}")
-
-        return serialized_data
-
+        # limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj)[:3]
+        # if limit:
+        #     queryset = queryset[:int(limit)]
+        return MiniRecipesSerializer(queryset, many=True).data
 
 class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='following.id')
