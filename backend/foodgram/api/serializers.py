@@ -33,12 +33,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class MiniRecipesSerializer(serializers.ModelSerializer):
-    
-    def __init__(self, *args, **kwargs):
-        limit = kwargs.pop('limit', None)
-        super(MiniRecipesSerializer, self).__init__(*args, **kwargs)
-        self.limit = limit
-
     class Meta:
         fields = ('id', 'name', 'image', 'cooking_time')
         model = Recipe
@@ -87,28 +81,12 @@ class FollowSerializer(BaseUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
-        logger.info(f'I am running!') # running logs
         request = self.context.get('request')
-        logger.info(f'request {request}') # request logs
-        limit = request.GET.get('recipes_limit')
-        logger.info(f'limit {limit}') # limit logs
+        # limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj)
-        logger.info(f'queryset {queryset}') # queryset logs
-        limit_value = 3
-        if limit:
-            limit_value = int(limit)
-
-        logger.info(f"Before limiting: {queryset.count()} recipes") # queryset logs
-        print(f"Before limiting: {queryset.count()} recipes for user {obj.username}")
-        queryset = queryset[:limit_value]
-        logger.info(f"After limiting: {queryset.count()} recipes") # queryset logs
-        print(f"After limiting: {queryset.count()} recipes for user {obj.username}")
-
-        serializer = MiniRecipesSerializer(queryset, many=True, context={'request': request, 'limit': limit})
-        logger.info(f"Serialized data: {serialized_data}")
-        print(f"Serialized data: {serialized_data}")
-
-        return serializer.data
+        # if limit:
+        #     queryset = queryset[:int(limit)]
+        return MiniRecipesSerializer(queryset[:3], many=True).data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
