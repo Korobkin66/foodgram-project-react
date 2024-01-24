@@ -37,7 +37,7 @@ class UserViewSet(UserViewSet):
             user=user, following=follow_author)
         if request.method == 'POST':
             serializer = SubscribeSerializer(data=request.data,
-                                             instance=follow_instance,
+                                             instance=follow_author,
                                              context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -53,8 +53,8 @@ class UserViewSet(UserViewSet):
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request, id=None):
         queryset = Follow.objects.filter(user=request.user)
-        # followed_users = queryset.values_list('following', flat=True)
-        # users = User.objects.filter(id__in=followed_users)
+        followed_users = queryset.values_list('following', flat=True)
+        users = User.objects.filter(id__in=followed_users)
         data = self.paginate_queryset(queryset)
         serializer = SubscribeSerializer(data, many=True,
                                       context={'request': request})
