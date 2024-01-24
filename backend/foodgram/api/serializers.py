@@ -11,12 +11,6 @@ from users.models import Follow, User
 from recipes.models import (Favorite, Ingredient, Quantity, Recipe,
                             ShoppingCart, Tag)
 
-import logging
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -69,32 +63,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             'last_name')
 
 
-class FollowSerializer(BaseUserSerializer):
-    recipes = MiniRecipesSerializer(read_only=True, many=True)
-    recipes_count = SerializerMethodField()
-
-    class Meta(BaseUserSerializer.Meta):
-        fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'is_subscribed', 'recipes', 'recipes_count')
-
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
-
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
-        if limit:
-            queryset = queryset[:int(limit)]
-        return MiniRecipesSerializer(queryset, many=True).data
-
-
 class SubscribeSerializer(serializers.ModelSerializer):
-    # id = serializers.ReadOnlyField(source='following.id')
-    # email = serializers.ReadOnlyField(source='following.email')
-    # username = serializers.ReadOnlyField(source='following.username')
-    # first_name = serializers.ReadOnlyField(source='following.first_name')
-    # last_name = serializers.ReadOnlyField(source='following.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()

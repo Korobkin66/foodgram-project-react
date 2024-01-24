@@ -13,10 +13,9 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from users.models import Follow, User
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from .serializers import (FavoriteSerializer, FollowSerializer,
+from .serializers import (FavoriteSerializer, SubscribeSerializer,
                           IngredientSerializer, BaseUserSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
-                          SubscribeSerializer,
                           TagSerializer, MiniRecipesSerializer)
 from .pagination import MyPagination
 from .services import get_shopping_cart
